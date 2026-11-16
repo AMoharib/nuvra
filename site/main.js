@@ -17,7 +17,7 @@ document.querySelectorAll('[data-reveal]').forEach((el) => reveal.observe(el));
 const loops = new IntersectionObserver((entries) => {
   for (const entry of entries) entry.target.classList.toggle('is-paused', !entry.isIntersecting);
 });
-document.querySelectorAll('.pill, .slot-pill').forEach((el) => loops.observe(el));
+document.querySelectorAll('.pill').forEach((el) => loops.observe(el));
 
 // ---------- the live sentence ----------
 const EXAMPLES = [
