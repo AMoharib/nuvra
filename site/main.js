@@ -1,5 +1,5 @@
 // Nuvra landing page. Everything here is an enhancement: without it the page shows the first example and
-// its answer, every section is visible, and the intro heading simply sits above its photograph.
+// its answer and every section is visible. The scroll scenes live in scenes.js.
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -17,34 +17,7 @@ document.querySelectorAll('[data-reveal]').forEach((el) => reveal.observe(el));
 const loops = new IntersectionObserver((entries) => {
   for (const entry of entries) entry.target.classList.toggle('is-paused', !entry.isIntersecting);
 });
-document.querySelectorAll('.pill, .stage-speak').forEach((el) => loops.observe(el));
-
-// ---------- intro: the word "inside" sits inside the photograph ----------
-// On a wide screen the photograph starts where the word "inside" starts, just under the heading's first line,
-// so that one word is set on the picture in the paper colour. On a phone, or without the script, the
-// photograph simply sits under the heading.
-const intro = document.querySelector('.intro');
-const inside = intro?.querySelector('.intro-inside');
-
-function offsetWithin(el, ancestor) {
-  let x = 0;
-  for (let node = el; node && node !== ancestor; node = node.offsetParent) x += node.offsetLeft;
-  return x;
-}
-
-function alignCross() {
-  if (!intro || !inside) return;
-  const cs = getComputedStyle(intro);
-  const wordX = offsetWithin(inside, intro);
-  const lineX = offsetWithin(inside.parentElement, intro);
-  // only when the section is a grid and "inside" shares its line with "English words"
-  const crosses = cs.display === 'grid' && wordX > lineX + 1;
-  if (crosses) {
-    const gap = 0.12 * parseFloat(getComputedStyle(inside).fontSize);
-    intro.style.setProperty('--photo-left', `${Math.round(wordX - parseFloat(cs.paddingLeft) - gap)}px`);
-  }
-  intro.classList.toggle('is-crossing', crosses);
-}
+document.querySelectorAll('.pill, .slot-pill').forEach((el) => loops.observe(el));
 
 // ---------- the live sentence ----------
 const EXAMPLES = [
@@ -184,7 +157,8 @@ document.addEventListener('keydown', (e) => {
   input.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
 });
 
-function layout() { fitInput(); alignCross(); }
-window.addEventListener('resize', layout);
-if (document.fonts) document.fonts.ready.then(layout); else layout();
-layout();
+if (input) {
+  window.addEventListener('resize', fitInput);
+  if (document.fonts) document.fonts.ready.then(fitInput);
+  fitInput();
+}

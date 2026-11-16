@@ -8,7 +8,8 @@
 <meta property="og:title" content="Nuvra: speak Arabic, paste English">
 <meta property="og:description" content="Free, open-source Windows dictation for people who think in Arabic and work in English.">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#f4f4f1">
+<meta name="theme-color" content="#09090b">
+<meta name="color-scheme" content="dark">
 <link rel="icon" type="image/png" href="assets/icon-96.png">
 <script>document.documentElement.classList.add('js')</script>
 <link rel="preconnect" href="https://api.fontshare.com">
@@ -17,6 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://api.fontshare.com/v2/css?f[]=sentient@300,400,500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/scenes/stage.css">
 <link rel="stylesheet" href="styles.css">
 <script src="main.js" defer></script>
 </head>
@@ -44,32 +46,36 @@
     <a class="button hero-action" data-load style="--d:500ms" href="https://github.com/Mahmoud6901/nuvra/releases/latest">Download for Windows</a>
   </div>
 
-  <figure class="hero-picture" data-open>
-    <img src="assets/img/kasr-el-nil-sign.jpg" width="2400" height="1800" fetchpriority="high" decoding="async" alt="An enamel street sign in Cairo: Kasr El Nil Street written in Arabic calligraphy above the same name in English, under a house number written as ٦ and as 6.">
-    <figcaption>Kasr El Nil Street, Cairo</figcaption>
+  <figure class="hero-window" data-open>
+    <div class="window" data-ui>
+      <div class="window-bar" aria-hidden="true"><img src="assets/icon-96.png" width="16" height="16" alt=""><span>Nuvra</span><span class="window-ctl"><svg viewBox="0 0 10 10"><path d="M0 5h10"/></svg><svg viewBox="0 0 10 10"><path d="M.5.5h9v9h-9z"/></svg><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10"/></svg></span></div>
+      <img class="window-shot" src="assets/img/app-history-ar.webp" width="1800" height="1360" fetchpriority="high" decoding="async" alt="Nuvra's window in Arabic, on the History tab: four English texts it pasted into Visual Studio Code, Claude Code, Slack and Cursor, each with Copy and Delete.">
+    </div>
+    <figcaption>History in the Arabic window: every text in English, with the app it went to.</figcaption>
   </figure>
 </header>
 
 <main>
 
-<section class="intro" id="mixed" aria-labelledby="mixed-title">
-  <h2 class="intro-title" id="mixed-title" data-reveal>
-    <span class="intro-line">Arabic sentences,</span>
-    <span class="intro-line">English words <span class="intro-inside">inside</span></span>
-  </h2>
-  <p class="intro-text" data-reveal style="--i:1">That is how most of us talk about code: “<span lang="ar" dir="rtl">راجع صفحة الـ login</span>”. Nuvra is built for it, and login stays login.</p>
-  <figure class="intro-big" data-reveal style="--i:1">
-    <div class="intro-crop"><img src="assets/img/arabic-keyboard-laptop.jpg" width="1200" height="1600" loading="lazy" decoding="async" alt="A hand resting on an HP laptop whose keys carry Arabic and Latin letters, with Arabic Wikipedia open on the screen."></div>
-    <figcaption>A MedinaPedia editing workshop, on a laptop with Arabic and Latin keys.</figcaption>
-  </figure>
-  <figure class="intro-small" data-reveal style="--i:2">
-    <img src="assets/img/cafe-keyboard-egypt.jpg" width="1089" height="756" loading="lazy" decoding="async" alt="Worn keyboard keys, each with a Latin and an Arabic letter, next to Enter, Shift, Alt and Control.">
-    <figcaption>A keyboard at an internet café in Egypt, 2006.</figcaption>
-  </figure>
+<section class="scene turn" id="mixed" data-scene="turn" data-options='{"hold":1.5}' aria-labelledby="mixed-title">
+  <div class="scene-stage turn-stage">
+    <h2 class="turn-title" id="mixed-title">Arabic sentences, English words inside</h2>
+    <div class="turn-box">
+      <div class="turn-say">
+        <p class="turn-cap cap-say">You say</p>
+        <p class="turn-line turn-ar" lang="ar" dir="rtl"><span class="t">راجع</span> <span class="t">صفحة</span> <span class="nw"><span class="t">الـ</span> <span class="t keep" data-keep="login" lang="en" dir="ltr">login</span></span> <span class="t">وحسّن</span> <span class="nw"><span class="t">الـ</span> <span class="t keep" data-keep="errors" lang="en" dir="ltr">error messages</span></span></p>
+      </div>
+      <div class="turn-paste">
+        <p class="turn-cap cap-paste">Nuvra pastes</p>
+        <p class="turn-line turn-en"><span class="t">Review</span> <span class="t">the</span> <span class="t keep" data-keep="login">login</span> <span class="t">page</span> <span class="t">and</span> <span class="t">improve</span> <span class="t">the</span> <span class="t keep" data-keep="errors">error messages</span></p>
+      </div>
+    </div>
+    <p class="turn-text">That is how most of us talk about code. Nuvra translates the Arabic and leaves your English words exactly as you said them.</p>
+  </div>
 </section>
 
-<section class="try night" id="try" aria-labelledby="try-title">
-  <h2 class="try-title" id="try-title" data-reveal>Your English stays English</h2>
+<section class="try" id="try" aria-labelledby="try-title">
+  <h2 class="try-title rise" id="try-title" data-reveal><span class="line"><span>Your English stays English</span></span></h2>
   <div class="try-line" data-ui data-reveal style="--i:1">
     <label class="sr-only" for="say">What you would say</label>
     <input id="say" class="try-input" type="text" dir="rtl" lang="ar" autocomplete="off" spellcheck="false" value="راجع صفحة الـ login وحسّن الـ error messages">
@@ -96,59 +102,81 @@
   </div>
 </section>
 
-<section class="how" id="how" aria-labelledby="how-title">
-  <h2 class="how-title" id="how-title" data-reveal>One shortcut, start to finish</h2>
-  <ol class="stages" data-ui>
-    <li class="stage stage-press" data-reveal style="--i:1">
-      <div class="stage-block"><p class="stage-time">A keypress</p></div>
-      <p class="stage-note">First, press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Space</kbd> in the field you are typing in.</p>
-    </li>
-    <li class="stage stage-speak" data-reveal style="--i:2">
-      <div class="stage-block"><p class="stage-time">As long as you talk</p><span class="stage-dots" aria-hidden="true"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i><i style="--i:9"></i><i style="--i:10"></i><i style="--i:11"></i><i style="--i:12"></i></span></div>
-      <p class="stage-note">Then talk, in Arabic, English or both. Nuvra transcribes while you speak, and <kbd>Esc</kbd> cancels.</p>
-    </li>
-    <li class="stage stage-write" data-reveal style="--i:3">
-      <div class="stage-block"><p class="stage-time">A moment</p></div>
-      <p class="stage-note">Next, press <kbd>Enter</kbd> to finish. Clear English is pasted at your cursor.</p>
-    </li>
-    <li class="stage stage-send" data-reveal style="--i:4">
-      <div class="stage-block"><p class="stage-time">When you are ready</p></div>
-      <p class="stage-note">Last, read it and send it yourself. Nuvra never presses Enter in your app.</p>
-    </li>
-  </ol>
-</section>
-
-<section class="privacy" id="privacy" aria-labelledby="privacy-title">
-  <h2 class="privacy-title" id="privacy-title" data-reveal><span class="privacy-indent">You choose what</span> goes online</h2>
-  <div class="privacy-body">
-    <div class="privacy-left">
-      <p data-reveal style="--i:1">With local Whisper, your voice is turned into text on your own machine. Anything that goes online goes to a provider you picked and signed in to, and Nuvra tells you when it does.</p>
-      <figure class="privacy-picture" data-reveal style="--i:2">
-        <img src="assets/img/arabic-typewriter.jpg" width="1503" height="1175" loading="lazy" decoding="async" alt="A pale green Olivetti Lettera 32 portable typewriter whose keys carry Arabic letters.">
-        <figcaption>An Olivetti Lettera 32 with Arabic keys.</figcaption>
-      </figure>
+<section class="scene how" id="how" data-scene="shortcut" data-options='{"hold":3}' data-beat="0" aria-labelledby="how-title">
+  <div class="scene-stage how-stage">
+    <div class="how-copy">
+      <h2 class="how-title" id="how-title">One shortcut, start to finish</h2>
+      <ol class="steps">
+        <li class="step" data-step="0"><h3>A keypress</h3><p>Press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Space</kbd> in the field you are typing in.</p></li>
+        <li class="step" data-step="1"><h3>As long as you talk</h3><p>Talk in Arabic, English or both. Nuvra transcribes while you speak, and <kbd>Esc</kbd> cancels.</p></li>
+        <li class="step" data-step="2"><h3>A moment</h3><p>Press <kbd>Enter</kbd> to finish. Clear English is pasted at your cursor.</p></li>
+        <li class="step" data-step="3"><h3>When you are ready</h3><p>Read it and send it yourself. Nuvra never presses Enter in your app.</p></li>
+      </ol>
+      <p class="how-count" aria-hidden="true"></p>
     </div>
-    <div class="privacy-table" data-reveal style="--i:2">
-      <p class="table-name" id="table-name">Where it runs</p>
-      <table aria-labelledby="table-name">
-        <thead class="sr-only"><tr><th scope="col">Job</th><th scope="col">Service</th><th scope="col">Where</th></tr></thead>
-        <tbody>
-          <tr><td>Speech</td><td>Local Whisper</td><td>On your computer</td></tr>
-          <tr><td>Speech</td><td>Cohere Transcribe</td><td>Online, at Cohere</td></tr>
-          <tr><td>Speech</td><td>Wispr Flow</td><td>Online, at Wispr Flow</td></tr>
-          <tr class="group"><td>Translation</td><td>Ollama with gemma4:e4b</td><td>On your computer</td></tr>
-          <tr><td>Prompts</td><td>Codex or Claude Code</td><td>Online, your own account</td></tr>
-          <tr class="group"><td>History</td><td>Your last 10 texts</td><td>On your computer</td></tr>
-          <tr><td>Settings</td><td>Preferences and vocabulary</td><td>On your computer</td></tr>
-        </tbody>
-      </table>
+    <div class="demo" data-ui aria-hidden="true">
+      <div class="demo-keys"><kbd class="k-ctrl">Ctrl</kbd><kbd class="k-alt">Alt</kbd><kbd class="k-space">Space</kbd><kbd class="k-enter">Enter</kbd></div>
+      <p class="demo-said" lang="ar" dir="rtl"><span>راجع</span> <span>صفحة</span> <span>الـ login</span> <span>وحسّن</span> <span>الـ error messages</span></p>
+      <div class="pill demo-pill"><span class="pill-btn"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></svg></span><span class="pill-dots demo-dots"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i></span><span class="pill-btn go"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8"/></svg></span></div>
+      <div class="demo-field">
+        <p class="demo-app">Team chat</p>
+        <p class="demo-text"><span class="demo-placeholder">Write a message</span><span class="demo-out">Review the login page and improve the error messages.</span><span class="demo-caret"></span></p>
+        <p class="demo-send">Enter sends. Nuvra never presses it.</p>
+      </div>
     </div>
   </div>
 </section>
 
+<section class="privacy" id="privacy" aria-labelledby="privacy-title">
+  <h2 class="privacy-title rise" id="privacy-title" data-reveal><span class="line"><span>You choose what</span></span><span class="line"><span>goes online</span></span></h2>
+  <div class="privacy-body">
+    <div class="privacy-left">
+      <p data-reveal style="--i:1">With local Whisper, your voice is turned into text on your own machine. Anything that goes online goes to a provider you picked and signed in to, and Nuvra tells you when it does.</p>
+      <div class="privacy-table" data-reveal style="--i:2">
+        <p class="table-name" id="table-name">Where it runs</p>
+        <table aria-labelledby="table-name">
+          <thead class="sr-only"><tr><th scope="col">Job</th><th scope="col">Service</th><th scope="col">Where</th></tr></thead>
+          <tbody>
+            <tr style="--r:0"><td>Speech</td><td>Local Whisper</td><td>On your computer</td></tr>
+            <tr style="--r:1"><td>Speech</td><td>Cohere Transcribe</td><td>Online, at Cohere</td></tr>
+            <tr style="--r:2"><td>Speech</td><td>Wispr Flow</td><td>Online, at Wispr Flow</td></tr>
+            <tr class="group" style="--r:3"><td>Translation</td><td>Ollama with gemma4:e4b</td><td>On your computer</td></tr>
+            <tr style="--r:4"><td>Prompts</td><td>Codex or Claude Code</td><td>Online, your own account</td></tr>
+            <tr class="group" style="--r:5"><td>History</td><td>Your last 10 texts</td><td>On your computer</td></tr>
+            <tr style="--r:6"><td>Settings</td><td>Preferences and vocabulary</td><td>On your computer</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <figure class="privacy-window shutter" data-reveal>
+      <div class="window" data-ui>
+        <div class="window-bar" aria-hidden="true"><img src="assets/icon-96.png" width="16" height="16" alt=""><span>Nuvra</span><span class="window-ctl"><svg viewBox="0 0 10 10"><path d="M0 5h10"/></svg><svg viewBox="0 0 10 10"><path d="M.5.5h9v9h-9z"/></svg><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10"/></svg></span></div>
+        <img class="window-shot" src="assets/img/app-models-ar.webp" width="1800" height="1360" loading="lazy" decoding="async" alt="The Models tab in Arabic: Whisper large-v3 and large-v3-turbo on your computer, with turbo in use on the graphics card, then Wispr Flow, Cohere Transcribe Arabic, and Codex signed in for English prompts.">
+      </div>
+      <figcaption>Models: each choice says where it runs before you pick it.</figcaption>
+    </figure>
+  </div>
+</section>
+
 <section class="kept" id="kept" aria-labelledby="kept-title">
-  <h2 class="kept-title" id="kept-title" data-reveal>Nothing you say gets lost</h2>
+  <h2 class="kept-title rise" id="kept-title" data-reveal><span class="line"><span>Nothing you say gets lost</span></span></h2>
   <p class="kept-text" data-reveal style="--i:1">The pill <span class="slot-ui slot-pill" data-ui aria-hidden="true"><span class="mini-btn"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></svg></span><span class="mini-dots"><i></i><i></i><i></i><i></i><i></i></span><span class="mini-btn go"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8"/></svg></span></span> stays small while you talk. If a paste can’t land, your words wait on the clipboard and in History, one click from Copy <span class="slot-ui slot-copy" data-ui aria-hidden="true">Copy</span>. Models shows when Whisper is Ready <span class="slot-ui slot-ready" data-ui aria-hidden="true"><i></i>Ready</span>, and Settings turns the window to Egyptian Arabic <span class="slot-ui slot-lang" data-ui aria-hidden="true"><b>EN</b><b class="on" lang="ar">ع</b></span>.</p>
+  <div class="kept-pair">
+    <figure class="kept-window kept-en shutter" data-reveal>
+      <div class="window" data-ui>
+        <div class="window-bar" aria-hidden="true"><img src="assets/icon-96.png" width="16" height="16" alt=""><span>Nuvra</span><span class="window-ctl"><svg viewBox="0 0 10 10"><path d="M0 5h10"/></svg><svg viewBox="0 0 10 10"><path d="M.5.5h9v9h-9z"/></svg><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10"/></svg></span></div>
+        <img class="window-shot" src="assets/img/app-history-en.webp" width="1800" height="1360" loading="lazy" decoding="async" alt="The History tab in English: the last texts Nuvra pasted, newest first, each with the time, the app it went to, Copy and Delete.">
+      </div>
+      <figcaption>History keeps your last ten texts on your computer.</figcaption>
+    </figure>
+    <figure class="kept-window kept-ar shutter" data-reveal style="--i:2">
+      <div class="window" data-ui>
+        <div class="window-bar" aria-hidden="true"><img src="assets/icon-96.png" width="16" height="16" alt=""><span>Nuvra</span><span class="window-ctl"><svg viewBox="0 0 10 10"><path d="M0 5h10"/></svg><svg viewBox="0 0 10 10"><path d="M.5.5h9v9h-9z"/></svg><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10"/></svg></span></div>
+        <img class="window-shot" src="assets/img/app-settings-ar.webp" width="1800" height="1360" loading="lazy" decoding="async" alt="The Settings tab in Arabic: language set to Arabic, writing mode set to Translate Arabic only, appearance, and automatic updates for Nuvra 0.5.4.">
+      </div>
+      <figcaption>Settings in Egyptian Arabic, right to left.</figcaption>
+    </figure>
+  </div>
   <div class="kept-after" data-reveal style="--i:2">
     <p>The window holds only History, Models and Settings. There is nothing to write in it: speaking always starts from the shortcut, wherever you are.</p>
     <a class="button" href="https://github.com/Mahmoud6901/nuvra/releases/latest">Download for Windows</a>
@@ -156,41 +184,41 @@
 </section>
 
 <section class="faq" id="questions" aria-labelledby="faq-title">
-  <h2 class="faq-title" id="faq-title" data-reveal>Questions before you install</h2>
+  <h2 class="faq-title rise" id="faq-title" data-reveal><span class="line"><span>Questions before you install</span></span></h2>
   <div class="faq-list">
     <details data-reveal style="--i:1">
       <summary>Does Nuvra press Enter or send anything for me?</summary>
-      <p>No. It pastes the text where your cursor was and stops there. Sending stays your action in your app. During a recording, Enter only finishes the recording.</p>
+      <div class="faq-answer"><p>No. It pastes the text where your cursor was and stops there. Sending stays your action in your app. During a recording, Enter only finishes the recording.</p></div>
     </details>
     <details data-reveal style="--i:2">
       <summary>Do I need an NVIDIA graphics card?</summary>
-      <p>No. Local Whisper also runs on the processor, and a GPU makes it faster. Local models need a one-time download and several gigabytes of free disk space.</p>
+      <div class="faq-answer"><p>No. Local Whisper also runs on the processor, and a GPU makes it faster. Local models need a one-time download and several gigabytes of free disk space.</p></div>
     </details>
     <details data-reveal style="--i:3">
       <summary>Which apps can it paste into?</summary>
-      <p>Any app with a text field you can type in: an AI coding tool, a terminal, a chat window, an editor. If a paste can’t land, the text goes to the clipboard and History, and the pill says so.</p>
+      <div class="faq-answer"><p>Any app with a text field you can type in: an AI coding tool, a terminal, a chat window, an editor. If a paste can’t land, the text goes to the clipboard and History, and the pill says so.</p></div>
     </details>
     <details data-reveal style="--i:4">
       <summary>Does my audio leave my computer?</summary>
-      <p>Not with local Whisper. If you choose Cohere or Wispr Flow, that provider’s online service hears it. Structured prompts and translation fallback send text, not audio, through the Codex or Claude Code account you signed in with.</p>
+      <div class="faq-answer"><p>Not with local Whisper. If you choose Cohere or Wispr Flow, that provider’s online service hears it. Structured prompts and translation fallback send text, not audio, through the Codex or Claude Code account you signed in with.</p></div>
     </details>
     <details data-reveal style="--i:5">
       <summary>Why does Windows warn me when I install it?</summary>
-      <p>The installer does not have a Windows publisher certificate yet, so SmartScreen may ask you to confirm. Updates are checked against the project’s own signing key before they install.</p>
+      <div class="faq-answer"><p>The installer does not have a Windows publisher certificate yet, so SmartScreen may ask you to confirm. Updates are checked against the project’s own signing key before they install.</p></div>
     </details>
     <details data-reveal style="--i:6">
       <summary>Can I use the app in Arabic?</summary>
-      <p>Yes. Settings, then Language, switches the window and the pill to Egyptian Arabic, right to left. Your prompts stay in English.</p>
+      <div class="faq-answer"><p>Yes. Settings, then Language, switches the window and the pill to Egyptian Arabic, right to left. Your prompts stay in English.</p></div>
     </details>
     <details data-reveal style="--i:7">
       <summary>Why is the installer called ArabicRelay-Setup?</summary>
-      <p>Nuvra used to be called Arabic Relay. The installer keeps the old name so existing installations update cleanly, with their settings, history and models where they were.</p>
+      <div class="faq-answer"><p>Nuvra used to be called Arabic Relay. The installer keeps the old name so existing installations update cleanly, with their settings, history and models where they were.</p></div>
     </details>
   </div>
 </section>
 
-<section class="close night" id="download" aria-labelledby="close-title">
-  <h2 class="close-title" id="close-title" data-reveal>Talk the way<br>you think</h2>
+<section class="close" id="download" aria-labelledby="close-title">
+  <h2 class="close-title rise" id="close-title" data-reveal><span class="line"><span>Talk the way</span></span><span class="line"><span>you think</span></span></h2>
   <div class="close-row" data-reveal style="--i:1">
     <p>Nuvra 0.5.4 is free and open source, for Windows 10 and 11, 64-bit. The installer adds Microsoft WebView2 if you need it.</p>
     <a class="button button-large" href="https://github.com/Mahmoud6901/nuvra/releases/latest">Download for Windows</a>
@@ -212,10 +240,14 @@
       <li><a class="link" href="https://github.com/Mahmoud6901/nuvra">Source code</a></li>
       <li><a class="link" href="https://github.com/Mahmoud6901/nuvra/releases">All releases</a></li>
     </ul>
-    <p class="credits">Pictures: <a href="https://commons.wikimedia.org/w/index.php?curid=152504095">“Street sign in Cairo 05”</a> by Marsupium, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; <a href="https://commons.wikimedia.org/wiki/File:MedinaPedia_workshop_3.jpg">“MedinaPedia workshop 3”</a> by Touzrimounir, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>; <a href="https://commons.wikimedia.org/wiki/File:Arab-keyboard.jpg">“Arab-keyboard”</a> by P. R. Binter, public domain; <a href="https://commons.wikimedia.org/w/index.php?curid=97350663">“Jovan Kuzminac - Arab typewriter”</a> by Viktor Lazić, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. All via Wikimedia Commons.</p>
     <p class="footer-year">Nuvra 0.5.4, 2026</p>
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+<script src="assets/scenes/stage.js"></script>
+<script src="scenes.js"></script>
 </body>
 </html>
