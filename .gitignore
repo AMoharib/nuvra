@@ -30,8 +30,9 @@ graphify-out/
 *.egg-info/
 .superpowers/
 
-# Local planning and documentation stay off GitHub
+# Local planning and documentation, except the public README
 *.md
+!/README.md
 /docs/
 /assets/imgs/
 /scripts/release_notes.py
