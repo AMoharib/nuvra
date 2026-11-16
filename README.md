@@ -4,7 +4,7 @@ Speak Arabic and English. Paste clear English text into the app where you are wo
 
 Nuvra is an open-source Windows dictation app. Start recording with a keyboard shortcut, speak naturally, and finish to paste the result into your active text field.
 
-[Download for Windows](https://github.com/Mahmoud6901/nuvra/releases/latest) · [Report a problem](https://github.com/Mahmoud6901/nuvra/issues/new?template=bug_report.yml)
+[Website](https://mahmoud6901.github.io/nuvra/) · [Download for Windows](https://github.com/Mahmoud6901/nuvra/releases/latest) · [Report a problem](https://github.com/Mahmoud6901/nuvra/issues/new?template=bug_report.yml)
 
 ## Install and get started
 
