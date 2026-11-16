@@ -249,7 +249,7 @@ figcaption { font-size: var(--step-small); line-height: 1.4; color: var(--muted)
 .footer-meta { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: start; margin-top: 2.5rem; font-size: var(--step-small); line-height: 1.5; }
 .footer-links { grid-column: 1 / 4; display: grid; gap: 0.2rem; }
 .footer-links a { text-decoration-color: currentColor; }
-.credits { grid-column: 4 / 11; max-width: 80ch; }
+.credits { grid-column: 4 / 11; max-width: 60ch; }
 .credits a { text-decoration-thickness: 0.06em; text-underline-offset: 0.18em; }
 .footer-year { grid-column: 11 / -1; justify-self: end; }
 
