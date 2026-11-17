@@ -10,7 +10,7 @@ Nuvra is an open-source dictation app for Windows, with experimental macOS build
 
 ### Windows
 
-1. Download `ArabicRelay-Setup-<version>.exe` from the latest release and run it. Installation is per user. The installer filename retains the original project name for compatibility with existing updates.
+1. Download the Windows installer from the [website](https://mahmoud6901.github.io/nuvra/#download) and run it. New builds are named `Nuvra-Setup-<version>.exe`. Installation is per user.
 2. Open Nuvra and choose a speech model in **Models**. Local Whisper models download from this tab. Cohere and Wispr Flow are also available.
 3. Install and sign in to Codex CLI or Claude Code, then select your preferred model in **Models** for English prompt preparation and translation fallback.
 4. Choose **Translate Arabic only** or **Structured prompt** in **Settings**.
@@ -20,7 +20,7 @@ Nuvra requires Windows 10 or 11, 64-bit, and Microsoft Edge WebView2. The instal
 
 ### macOS (experimental)
 
-macOS 15 or newer is required. Check the [release assets](https://github.com/Mahmoud6901/nuvra/releases/latest) for macOS downloads. If a release has no Mac assets, use the artifacts from a successful [macOS builds workflow](https://github.com/Mahmoud6901/nuvra/actions/workflows/macos.yml) or [build from source](#build-macos-release-assets). Downloading workflow artifacts requires a GitHub sign-in.
+macOS 15 or newer is required. Download the Mac preview from the [website](https://mahmoud6901.github.io/nuvra/#macos-download) or the [release assets](https://github.com/Mahmoud6901/nuvra/releases/latest). If a release has no Mac assets, use the artifacts from a successful [macOS builds workflow](https://github.com/Mahmoud6901/nuvra/actions/workflows/macos.yml?query=branch%3Amain+is%3Asuccess) or [build from source](#build-macos-release-assets). Downloading workflow artifacts requires a GitHub sign-in.
 
 Download `Nuvra-<version>-macos-arm64.dmg` for Apple Silicon or `Nuvra-<version>-macos-x86_64.dmg` for Intel from the release assets. Open the DMG and drag **Nuvra** into **Applications**. ZIP archives of the same app are also available. Verify downloads against the matching `SHA256SUMS-macos-<architecture>.txt` file.
 
@@ -154,7 +154,7 @@ node tests/test_incremental_ui.cjs --quick --inline
 node tests/test_voice.cjs --quick
 ```
 
-The full Python suite also contains Windows installer and update tests that require Windows. The release workflow includes the complete test and installer verification steps. See [the release workflow](.github/workflows/release.yml).
+Run the full Python suite on Windows because it includes Windows-specific integration tests. The release workflow includes the complete test and installer verification steps. See [the release workflow](.github/workflows/release.yml).
 
 ### Build the Windows installer
 
@@ -165,7 +165,9 @@ Install Inno Setup 6, then run the build from the repository root.
 .\scripts\build.ps1
 ```
 
-The build creates `dist\Nuvra\Nuvra.exe` and `dist\ArabicRelay-Setup-<version>.exe` and runs the packaged app's self-test.
+The build creates `dist\Nuvra\Nuvra.exe` and `dist\Nuvra-Setup-<version>.exe` and runs the packaged app's self-test.
+
+The release workflow also publishes an identical `ArabicRelay-Setup-<version>.exe` alias for older automatic updaters, with checksums and signatures for both filenames. New clients and the website prefer `Nuvra-Setup`; they also accept the older filename in existing releases. The installer keeps its original application ID and data locations so upgrades preserve settings, history and models. Run `python scripts/sign_release.py <tag>` to sign all installer aliases and publish the draft; mismatched aliases are rejected.
 
 ### Build macOS release assets
 

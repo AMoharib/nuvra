@@ -117,13 +117,17 @@ def small_download(url):
 def download(release, version):
     if sys.platform == 'darwin':
         raise ValueError('Download the macOS DMG from the release page and replace Nuvra in Applications.')
-    name = f'ArabicRelay-Setup-{version}.exe'
+    assets = {asset['name']: asset for asset in release.get('assets', [])}
+    # Prefer the current name, but keep existing published releases installable.
+    # A present Nuvra installer must pass its own checks; never downgrade on failure.
+    name = f'Nuvra-Setup-{version}.exe'
+    if name not in assets:
+        name = f'ArabicRelay-Setup-{version}.exe'
     target, signature_file = folder() / name, folder() / (name + '.sig')
     for old in folder().iterdir():
         if not old.name.startswith(name.removesuffix('.exe')):
             old.unlink()  # earlier versions and their markers
     try:
-        assets = {asset['name']: asset for asset in release.get('assets', [])}
         if not {name, name + '.sig', 'SHA256SUMS.txt'} <= set(assets):
             raise ValueError('the release is missing its installer, signature or checksums')
         sums = small_download(assets['SHA256SUMS.txt']['browser_download_url']).decode()

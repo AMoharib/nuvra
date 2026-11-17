@@ -45,6 +45,8 @@ jobs:
           node tests/test_capture_keys_ui.cjs
           node tests/test_ship_ui.cjs
           node tests/test_site_downloads.cjs
+          node tests/test_site_language.cjs
+          python scripts/build_site_ar.py --check
           node tests/test_inline_ui.cjs
           node tests/test_quick_ui.cjs
           node tests/test_flow_capture.cjs
@@ -62,11 +64,16 @@ jobs:
           }
       - name: Build, self-test, installer smoke test
         run: ./scripts/build.ps1 -Smoke
-      - name: Checksums
+      - name: Legacy updater alias and checksums
         run: |
           $version = "$env:GITHUB_REF_NAME".Substring(1)
-          $name = "ArabicRelay-Setup-$version.exe"
-          "$((Get-FileHash "dist\$name" -Algorithm SHA256).Hash.ToLower())  $name" | Set-Content dist\SHA256SUMS.txt -Encoding ascii
+          $name = "Nuvra-Setup-$version.exe"
+          $legacy = "ArabicRelay-Setup-$version.exe"
+          # Already installed versions look for the old asset name exactly.
+          Copy-Item "dist\$name" "dist\$legacy"
+          @($name, $legacy) | ForEach-Object {
+            "$((Get-FileHash "dist\$_" -Algorithm SHA256).Hash.ToLower())  $_"
+          } | Set-Content dist\SHA256SUMS.txt -Encoding ascii
       - name: Collect macOS assets
         uses: actions/download-artifact@v4
         with:
@@ -80,4 +87,4 @@ jobs:
         run: |
           version="${GITHUB_REF_NAME#v}"
           gh release create "$GITHUB_REF_NAME" --draft --title "Nuvra $version" --generate-notes \
-            "dist/ArabicRelay-Setup-$version.exe" dist/SHA256SUMS.txt dist/macos/*
+            "dist/Nuvra-Setup-$version.exe" "dist/ArabicRelay-Setup-$version.exe" dist/SHA256SUMS.txt dist/macos/*

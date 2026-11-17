@@ -4,7 +4,6 @@ from types import SimpleNamespace
 import sqlite3
 import tempfile
 import threading
-import time
 import unittest
 from unittest.mock import Mock, patch
 
@@ -184,39 +183,48 @@ class ClipboardSettle(unittest.TestCase):
         return win
 
     def setUp(self):
+        # Drive the polling clock explicitly; a loaded CI runner can skip real-time samples.
+        self.now = 0
+        clock = SimpleNamespace(monotonic=lambda: self.now, sleep=self.advance)
+        patcher = patch.object(paste, 'time', clock)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         for name, value in (('CLIPBOARD_QUIET', .03), ('CLIPBOARD_BUSY_LIMIT', .15)):
             patcher = patch.object(paste, name, value)
             patcher.start()
             self.addCleanup(patcher.stop)
 
+    def advance(self, seconds):
+        self.now += seconds
+
     def test_returns_once_nobody_has_held_it_for_a_moment(self):
         win = self.windows(lambda _: True)
-        started = time.monotonic()
+        started = self.now
         win.settle_clipboard()
-        self.assertGreaterEqual(time.monotonic() - started, .03)
-        self.assertLess(time.monotonic() - started, .15)
+        self.assertGreaterEqual(self.now - started, .03)
+        self.assertLess(self.now - started, .15)
         self.assertEqual(win.user.CloseClipboard.call_count, win.user.OpenClipboard.call_count)
 
     def test_another_program_holding_it_restarts_the_wait(self):
-        started = time.monotonic()
+        started = self.now
         busy = [started]
 
         def free(_):
-            if time.monotonic() - started > .06:
+            if self.now - started > .06:
                 return True
-            busy[0] = time.monotonic()
+            busy[0] = self.now
             return False
         win = self.windows(free)
         win.settle_clipboard()
-        self.assertGreaterEqual(time.monotonic() - busy[0], .03)
+        self.assertGreaterEqual(self.now - busy[0], .03)
         self.assertGreater(busy[0] - started, .04, 'the holder was seen')
 
     def test_a_clipboard_that_stays_busy_does_not_block_the_paste(self):
         win = self.windows(lambda _: False)
-        started = time.monotonic()
+        started = self.now
         win.settle_clipboard()
-        self.assertGreaterEqual(time.monotonic() - started, .15)
-        self.assertLess(time.monotonic() - started, 1)
+        self.assertGreaterEqual(self.now - started, .15)
+        self.assertLess(self.now - started, 1)
         win.user.CloseClipboard.assert_not_called()     # never closes what it did not open
 
 

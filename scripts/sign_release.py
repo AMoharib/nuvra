@@ -7,7 +7,9 @@ The private key never leaves this computer. Back it up (for example in a passwor
 reinstall manually once to trust a new key.
 """
 import argparse
+import hashlib
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -52,20 +54,33 @@ def main(argv):
         return 0
     if not args.tag:
         parser.error('give a release tag, for example v0.2.0')
+    if not re.fullmatch(r'v\d+\.\d+\.\d+', args.tag):
+        parser.error('the release tag must be v<major>.<minor>.<patch>')
+    version = args.tag[1:]
+    names = [f'Nuvra-Setup-{version}.exe', f'ArabicRelay-Setup-{version}.exe']
     with tempfile.TemporaryDirectory() as folder:
-        gh('release', 'download', args.tag, '-p', 'ArabicRelay-Setup-*.exe', '-D', folder)
-        found = list(Path(folder).glob('ArabicRelay-Setup-*.exe'))
-        if len(found) != 1:
-            print(f'Expected one installer in {args.tag}, found {len(found)}.', file=sys.stderr)
+        gh('release', 'download', args.tag, '-p', names[0], '-p', names[1], '-D', folder)
+        found = [Path(folder) / name for name in names if (Path(folder) / name).is_file()]
+        if not found:
+            print(f'No installer for {args.tag}. Nothing was published.', file=sys.stderr)
             return 1
-        setup = found[0]
-        signature = sign(setup, args.key)
-        if not updates.verify(setup, signature):
-            print('This key does not match updates.PUBLIC_KEY built into the app. Nothing was published.', file=sys.stderr)
+        digests = set()
+        for setup in found:
+            with setup.open('rb') as source:
+                digests.add(hashlib.file_digest(source, 'sha256').digest())
+        if len(digests) != 1:
+            print('The installer and legacy alias differ. Nothing was published.', file=sys.stderr)
             return 1
-        signature_file = setup.with_name(setup.name + '.sig')
-        signature_file.write_bytes(signature)
-        gh('release', 'upload', args.tag, str(signature_file), '--clobber')
+        signatures = []
+        for setup in found:
+            signature = sign(setup, args.key)
+            if not updates.verify(setup, signature):
+                print('This key does not match updates.PUBLIC_KEY built into the app. Nothing was published.', file=sys.stderr)
+                return 1
+            signature_file = setup.with_name(setup.name + '.sig')
+            signature_file.write_bytes(signature)
+            signatures.append(str(signature_file))
+        gh('release', 'upload', args.tag, *signatures, '--clobber')
         gh('release', 'edit', args.tag, '--draft=false')
     print(f'{args.tag} is signed and published.')
     return 0
