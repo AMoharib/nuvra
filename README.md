@@ -151,7 +151,7 @@ Run on the target architecture Mac with Python 3.13 and Apple's command-line too
 
 The script creates `dist/Nuvra.app`, a DMG with an Applications shortcut, a ZIP, and SHA-256 checksums. It generates the macOS icon from the existing PNG, verifies the bundle's ad-hoc signature, and runs `--self-test` using a temporary data directory. That test checks the HTTP server and imports the packaged speech engine. A second `--self-test-gui` briefly opens a native window and checks that WebKit exposes the recording APIs. Neither test records audio or sends keys to another app. Build in a logged-in graphical macOS session.
 
-The macOS workflow builds both architectures on pull requests and manual runs. Tagged releases wait for these builds and attach their assets to the existing draft release. The maintainer's offline Windows signing/publishing step remains unchanged. Apple Developer ID signing and notarization require a separate maintainer setup.
+The macOS workflow builds both architectures on branch pushes, pull requests and manual runs. Tagged releases wait for these builds and attach their assets to the existing draft release. The maintainer's offline Windows signing/publishing step remains unchanged. Apple Developer ID signing and notarization require a separate maintainer setup. The Tests workflow also supports manual runs, so contributors can check their branch in their own fork while an upstream workflow awaits approval.
 
 Before publishing a macOS build, test microphone permission, dictation, Return/Escape, clipboard restoration, and pasting into a real text field on each architecture. Automated tests mock global input and use a separate test clipboard.
 

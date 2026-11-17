@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nuvra: speak Arabic, paste English</title>
-<meta name="description" content="Nuvra is a free, open-source Windows dictation app. Press Ctrl + Alt + Space, talk in Arabic and English, and clear English is pasted where you were typing.">
+<meta name="description" content="Nuvra is free, open-source dictation for Windows, with an experimental macOS preview. Speak Arabic and English and paste clear English where you were typing.">
 <meta property="og:title" content="Nuvra: speak Arabic, paste English">
-<meta property="og:description" content="Free, open-source Windows dictation for people who think in Arabic and work in English.">
+<meta property="og:description" content="Free, open-source dictation for people who think in Arabic and work in English. Windows and an experimental macOS preview.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#09090b">
 <meta name="color-scheme" content="dark">
@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="assets/scenes/stage.css">
 <link rel="stylesheet" href="styles.css">
 <script src="main.js" defer></script>
+<script src="downloads.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -34,7 +35,7 @@
         <li><a class="link" href="#questions">Questions</a></li>
       </ul>
       <a class="repo-link" href="https://github.com/Mahmoud6901/nuvra" aria-label="Nuvra source code on GitHub" title="View source on GitHub"><img src="assets/icons/github.svg" width="24" height="24" alt=""></a>
-      <a class="button button-small" href="https://github.com/Mahmoud6901/nuvra/releases/latest">Download</a>
+      <a class="button button-small" href="#download">Download</a>
     </div>
   </nav>
 
@@ -43,8 +44,9 @@
       <span class="line"><span data-line style="--i:0">Speak Arabic,</span></span>
       <span class="line"><span data-line style="--i:1"><span class="pill" data-ui aria-hidden="true"><span class="pill-btn"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></svg></span><span class="pill-dots"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i></span><span class="pill-btn go"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8"/></svg></span></span> paste English</span></span>
     </h1>
-    <p class="hero-sub" data-load style="--d:420ms">A free Windows app: press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Space</kbd>, talk in Arabic and English, and clear English is pasted where you were typing.</p>
-    <a class="button hero-action" data-load style="--d:500ms" href="https://github.com/Mahmoud6901/nuvra/releases/latest">Download for Windows</a>
+    <p class="hero-sub" data-load style="--d:420ms">A free dictation app: use one shortcut, talk in Arabic and English, and clear English is pasted where you were typing.</p>
+    <a class="button hero-action" data-load style="--d:500ms" href="#download">Choose your download</a>
+    <p class="platform-note">Windows 10/11 · <a href="#macos-download">macOS 15+ preview</a></p>
   </div>
 
   <figure class="hero-window" data-open>
@@ -107,9 +109,9 @@
     <div class="how-copy">
       <h2 class="how-title" id="how-title">One shortcut, start to finish</h2>
       <ol class="steps">
-        <li class="step" data-step="0"><h3>A keypress</h3><p>Press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Space</kbd> in the field you are typing in.</p></li>
+        <li class="step" data-step="0"><h3>A keypress</h3><p>Press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Space</kbd> in the field you are typing in. On Mac, use <kbd>Control</kbd> + <kbd>Option</kbd> + <kbd>Space</kbd>.</p></li>
         <li class="step" data-step="1"><h3>As long as you talk</h3><p>Talk in Arabic, English or both. Nuvra transcribes while you speak, and <kbd>Esc</kbd> cancels.</p></li>
-        <li class="step" data-step="2"><h3>A moment</h3><p>Press <kbd>Enter</kbd> to finish. Clear English is pasted at your cursor.</p></li>
+        <li class="step" data-step="2"><h3>A moment</h3><p>Press <kbd>Enter</kbd> on Windows or <kbd>Return</kbd> on Mac to finish. Clear English is pasted at your cursor.</p></li>
         <li class="step" data-step="3"><h3>When you are ready</h3><p>Read it and send it yourself. Nuvra never presses Enter in your app.</p></li>
       </ol>
       <p class="how-count" aria-hidden="true"></p>
@@ -176,7 +178,7 @@
   </div>
   <div class="kept-after" data-reveal style="--i:2">
     <p>The window holds only History, Models and Settings. There is nothing to write in it: speaking always starts from the shortcut, wherever you are.</p>
-    <a class="button" href="https://github.com/Mahmoud6901/nuvra/releases/latest">Download for Windows</a>
+    <a class="button" href="#download">Choose your download</a>
   </div>
 </section>
 
@@ -189,11 +191,11 @@
     </details>
     <details data-reveal style="--i:2">
       <summary>Do I need an NVIDIA graphics card?</summary>
-      <div class="faq-answer"><p>No. Local Whisper also runs on the processor, and a GPU makes it faster. Local models need a one-time download and several gigabytes of free disk space.</p></div>
+      <div class="faq-answer"><p>No. Local Whisper runs on the processor on both platforms. Windows can also use an NVIDIA GPU; the macOS preview uses the CPU, without Metal acceleration. Local models need a one-time download and several gigabytes of free disk space.</p></div>
     </details>
     <details data-reveal style="--i:3">
       <summary>Which apps can it paste into?</summary>
-      <div class="faq-answer"><p>Any app with a text field you can type in: an AI coding tool, a terminal, a chat window, an editor. If a paste can’t land, the text goes to the clipboard and History, and the pill says so.</p></div>
+      <div class="faq-answer"><p>Use it in text fields in your editor, terminal, chat window or AI coding tool. On macOS, the target app must expose its focused field through Accessibility. If Nuvra cannot verify the field or paste into it, it keeps the text in History and tries to copy it to the clipboard.</p></div>
     </details>
     <details data-reveal style="--i:4">
       <summary>Does my audio leave my computer?</summary>
@@ -204,6 +206,10 @@
       <div class="faq-answer"><p>The installer does not have a Windows publisher certificate yet, so SmartScreen may ask you to confirm. Updates are checked against the project’s own signing key before they install.</p></div>
     </details>
     <details data-reveal style="--i:6">
+      <summary>What does the macOS preview need?</summary>
+      <div class="faq-answer"><p>macOS 15 or newer, on Apple Silicon or Intel. Allow Microphone and Accessibility access for recording, global shortcuts and paste, then restart Nuvra. The preview is not Apple-notarized. Follow the <a href="https://github.com/Mahmoud6901/nuvra#macos-experimental">macOS installation notes</a> if the first launch is blocked. Updates are manual: quit Nuvra and replace it with the new app.</p></div>
+    </details>
+    <details data-reveal style="--i:7">
       <summary>Can I use the app in Arabic?</summary>
       <div class="faq-answer"><p>Yes. Settings, then Language, switches the window and the pill to Egyptian Arabic, right to left. Your prompts stay in English.</p></div>
     </details>
@@ -217,8 +223,23 @@
 <section class="close" id="download" aria-labelledby="close-title">
   <h2 class="close-title rise" id="close-title" data-reveal><span class="line"><span>Talk the way</span></span><span class="line"><span>you think</span></span></h2>
   <div class="close-row" data-reveal style="--i:1">
-    <p>Nuvra 0.5.4 is free and open source, for Windows 10 and 11, 64-bit. The installer adds Microsoft WebView2 if you need it.</p>
+    <p>For Windows 10 and 11, 64-bit. The installer adds Microsoft WebView2 if you need it. Free and open source.</p>
     <a class="button button-large" href="https://github.com/Mahmoud6901/nuvra/releases/latest">Download for Windows</a>
+  </div>
+  <div class="mac-download" id="macos-download">
+    <div class="mac-download-copy">
+      <h3>macOS preview</h3>
+      <p>macOS 15 or newer. Choose Apple Silicon for M-series Macs, or Intel for older models. CPU speech processing; not Apple-notarized.</p>
+      <a href="https://github.com/Mahmoud6901/nuvra#macos-experimental">Installation and permissions</a>
+    </div>
+    <div class="mac-download-actions">
+      <p id="mac-release-status" role="status">Check the release page for macOS preview builds.</p>
+      <div class="mac-download-links" id="mac-download-links" hidden>
+        <a class="button" data-macos-arch="arm64" hidden>Download for Apple Silicon</a>
+        <a class="button" data-macos-arch="x86_64" hidden>Download for Intel Mac</a>
+      </div>
+      <p class="mac-release-links"><a href="https://github.com/Mahmoud6901/nuvra/releases">All releases</a> · <a href="https://github.com/Mahmoud6901/nuvra/pull/1">Preview status</a></p>
+    </div>
   </div>
 </section>
 
@@ -227,13 +248,13 @@
 <footer class="footer">
   <div class="footer-top">
     <a class="wordmark" href="#top"><img loading="lazy" src="assets/icon-96.png" width="28" height="28" alt="">Nuvra</a>
-    <p>Open-source Windows dictation for people who think in Arabic and work in English. MIT licence.</p>
+    <p>Open-source dictation for people who think in Arabic and work in English. Windows, with a macOS preview. MIT licence.</p>
     <a class="link footer-up" href="#top">Back to top<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></a>
   </div>
   <a class="footer-line" href="https://github.com/Mahmoud6901/nuvra/issues/new?template=bug_report.yml"><span>Open an issue on GitHub</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a>
   <div class="footer-meta">
     <ul class="footer-links" aria-label="Project links">
-      <li><a class="link" href="https://github.com/Mahmoud6901/nuvra/releases/latest">Download</a></li>
+      <li><a class="link" href="#download">Downloads</a></li>
       <li><a class="link" href="https://github.com/Mahmoud6901/nuvra">Source code</a></li>
       <li><a class="link" href="https://github.com/Mahmoud6901/nuvra/releases">All releases</a></li>
     </ul>
