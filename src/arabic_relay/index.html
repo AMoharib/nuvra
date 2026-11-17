@@ -9,7 +9,7 @@ document.documentElement.dataset.quick=String(window.location?.search==='?quick=
 // tests/test_language_ui.cjs fails if a string the app can show has no English.
 const RELAY_EN={
  "جاهز":"Ready",
- "أثناء التسجيل: Enter لإنهاء التسجيل واللصق، وEsc للإلغاء.":"While recording: Enter to finish and paste, Esc to cancel.",
+ "أثناء التسجيل: {finish} لإنهاء التسجيل واللصق، وEsc للإلغاء.":"While recording: {finish} to finish and paste, Esc to cancel.",
  "السجل":"History",
  "النماذج":"Models",
  "الإعدادات":"Settings",
@@ -123,12 +123,12 @@ const RELAY_EN={
  "حذف":"Delete",
  "لسه مفيش حاجة هنا.":"Nothing here yet.",
  "دوس {key} في أي تطبيق واتكلم، والنص هيتلصق مكان ما كنت بتكتب.":"Press {key} in any app and speak. The text is pasted where you were typing.",
- "التسجيل بيشتغل من تطبيق الويندوز بس.":"Recording works only in the Windows app.",
+ "التسجيل بيشتغل من تطبيق الكمبيوتر بس.":"Recording works only in the desktop app.",
  "تمسح السجل كله؟":"Clear all history?",
  "كل النصوص المحفوظة هتتمسح من جهازك.":"All saved texts will be deleted from this computer.",
  "مسح الكل":"Clear all",
  "اتنسخ.":"Copied.",
- "ما قدرتش أنسخ. افتح النص وانسخه بـ Ctrl + C.":"Couldn't copy. Open the text and copy it with Ctrl + C.",
+ "ما قدرتش أنسخ. افتح النص وانسخه بـ {copy}.":"Couldn't copy. Open the text and copy it with {copy}.",
  "تمسح النص ده؟":"Delete this text?",
  "هيتمسح من السجل على جهازك.":"It will be deleted from History on this computer.",
  "مسح":"Delete",
@@ -144,7 +144,7 @@ const RELAY_EN={
  "اكتب الكلمة زي ما اتسمعت والكتابة الإنجليزي.":"Enter the word as heard and its English spelling.",
  "القاعدة دي مش موجودة.":"That rule no longer exists.",
  "اتمسحت الكلمات المحفوظة.":"Saved words cleared.",
- "فيه مفتاح محفوظ على حساب الويندوز ده. اكتب مفتاح تاني لو عايز تغيّره.":"A key is saved on this Windows account. Enter another key to change it.",
+ "فيه مفتاح محفوظ على حسابك على الجهاز ده. اكتب مفتاح تاني لو عايز تغيّره.":"A key is saved on your account on this computer. Enter another key to change it.",
  "مفيش مفتاح محفوظ. ضيف مفتاحك عشان الاختيار ده يشتغل.":"No key saved. Add your key to use this option.",
  "Wispr Flow بيحوّل الكلام أونلاين بحسابك، والبرنامج بياخد النص بس.":"Wispr Flow converts speech online with your account. The app only receives the text.",
  "Cohere بيحوّل العربي والإنجليزي أونلاين. الصوت بيتبعت لما توقف التسجيل.":"Cohere converts Arabic and English online. The audio is sent when you stop recording.",
@@ -190,7 +190,7 @@ const RELAY_EN={
  "التسجيل وقف. جرّب تاني.":"Recording stopped. Try again.",
  "اتلغى التسجيل.":"Recording cancelled.",
  "التسجيل كبير أوي. سجّل حاجة أقصر.":"The recording is too large. Record something shorter.",
- "البرنامج محتاج إذن المايك. اسمح بيه من إعدادات الويندوز.":"The app needs microphone permission. Allow it in Windows settings.",
+ "البرنامج محتاج إذن المايك. اسمح بيه من إعدادات الخصوصية في النظام.":"The app needs microphone permission. Allow it in your system privacy settings.",
  "الأدق":"Most accurate",
  "الأسرع":"Fastest",
  "بجرّب الكلام…":"Testing speech…",
@@ -234,7 +234,7 @@ const RELAY_EN={
  "مفيش تطبيق ألصق فيه.":"No app to paste into.",
  "الترجمة ما كملتش.":"Translation didn't finish.",
  "اتنسخ وهتلاقيه في السجل.":"Copied and saved in History.",
- "اتنسخ، الصق بـ Ctrl + V.":"Copied. Paste with Ctrl + V.",
+ "اتنسخ، الصق بـ {paste}.":"Copied. Paste with {paste}.",
  "هتلاقيه في السجل.":"Saved in History.",
  "ما قدرتش أحفظه.":"Couldn't save it.",
  "بسمعك…":"Listening…",
@@ -339,9 +339,11 @@ function relayEnglish(text){
  for(const [pattern,english] of RELAY_EN_PATTERNS)if(pattern.test(text))return text.replace(pattern,english);
  return text;
 }
+let relayKeys={copy:'Ctrl + C',paste:'Ctrl + V',finish:'Enter'};
 function tr(text,values){
+ if(typeof text!=='string')return text;
  let out=relayLanguage==='en'&&typeof text==='string'?relayEnglish(text):text;
- for(const [name,value] of Object.entries(values||{}))out=out.split('{'+name+'}').join(value);
+ for(const [name,value] of Object.entries({...relayKeys,...values}))out=out.split('{'+name+'}').join(value);
  return out;
 }
 // The static page is written in Arabic. In English, its text and labels change once, before the first paint.
@@ -567,7 +569,7 @@ dialog p{margin-bottom:10px;color:var(--muted);font-size:14px}
  <section class="panel" id="settingsPanel" role="tabpanel" aria-labelledby="settingsButton" hidden><div class="column">
   <section class="group" id="languageSettings"><h2>اللغة</h2><div class="mode-buttons" role="group" aria-label="لغة البرنامج"><button class="btn" id="languageArabic" lang="ar" aria-pressed="true">العربية</button><button class="btn" id="languageEnglish" lang="en" aria-pressed="false">English</button></div><p class="group-help">بتغيّر لغة البرنامج بس. البرومبت بيفضل بالإنجليزي.</p></section>
   <section class="group"><h2>طريقة الكتابة</h2><div class="mode-buttons" role="group" aria-label="طريقة الكتابة"><button class="btn" id="craftMode" aria-pressed="true">برومبت منظّم</button><button class="btn" id="inlineMode" aria-pressed="false">ترجمة العربي بس</button></div><p class="group-help" id="modeHelp"></p></section>
-  <section class="group" id="shortcutSettings" hidden><h2>الاختصار</h2><div class="setting"><label for="shortcutChoice">اختصار التسجيل</label><select id="shortcutChoice" dir="ltr"><option value="ctrl-alt-space">Ctrl + Alt + Space</option><option value="ctrl-alt-r">Ctrl + Alt + R</option><option value="ctrl-shift-space">Ctrl + Shift + Space</option></select></div><p class="group-help" id="shortcutHelp" role="status">سيب البرنامج مفتوح أو متصغّر. الاختصار بيبدأ التسجيل وبيوقفه.</p><p class="group-help" id="shortcutStatus" hidden></p><p class="group-help">أثناء التسجيل: Enter لإنهاء التسجيل واللصق، وEsc للإلغاء.</p></section>
+  <section class="group" id="shortcutSettings" hidden><h2>الاختصار</h2><div class="setting"><label for="shortcutChoice">اختصار التسجيل</label><select id="shortcutChoice" dir="ltr"><option value="ctrl-alt-space">Ctrl + Alt + Space</option><option value="ctrl-alt-r">Ctrl + Alt + R</option><option value="ctrl-shift-space">Ctrl + Shift + Space</option></select></div><p class="group-help" id="shortcutHelp" role="status">سيب البرنامج مفتوح أو متصغّر. الاختصار بيبدأ التسجيل وبيوقفه.</p><p class="group-help" id="shortcutStatus" hidden></p><p class="group-help" id="captureKeysHelp">أثناء التسجيل: {finish} لإنهاء التسجيل واللصق، وEsc للإلغاء.</p></section>
   <section class="group"><h2>الشكل</h2><button class="btn" id="themeToggle" aria-label="غيّر للوضع الفاتح"><svg aria-hidden="true" focusable="false"><use href="#i-sun"/></svg><span>الوضع الفاتح</span></button></section>
   <section class="group" id="aboutSettings"><h2>التحديثات</h2><p id="appVersion">Nuvra</p><div class="setting"><label for="updateMode">طريقة التحديث</label><select id="updateMode"><option value="auto">تلقائي</option><option value="notify">تنبيه بس</option><option value="off">إيقاف</option></select></div><label class="choice"><input id="installOnQuit" type="checkbox" checked>ثبّت التحديثات لما أقفل البرنامج</label></section>
   <details class="group" id="advancedSettings"><summary>متقدم</summary>
@@ -723,7 +725,7 @@ async function refresh(){
 $('refresh').addEventListener('click',refresh);
 for(const id of ['arabic','english'])$(id).addEventListener('input',()=>{if(id==='english'&&inlineMode()){inlineEdited();inlineSourceDirty=false;scheduleInline();}if(id==='arabic')scheduleQuickPrompt();invalidate();});
 $('example').addEventListener('click',()=>{if(listening)return;learningOriginal='';$('originalSpeech').style.display='none';$('arabic').value=tr('راجع صفحة تسجيل الدخول، وحسّن رسائل الخطأ عشان تكون واضحة للمستخدم. ما تغيّرش طريقة تسجيل الدخول الحالية، واتأكد إن الصفحة بتشتغل كويس على الموبايل.');invalidate();$('arabic').focus();});
-$('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('english').value);notice('English prompt copied.',true);}catch{notice('Select the English prompt and copy it with Ctrl+C.');}});
+$('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('english').value);notice('English prompt copied.',true);}catch{notice(`Select the English prompt and copy it with ${relayKeys.copy}.`);}});
 $('clearDraft').addEventListener('click',()=>{if(busy||listening)return;pasteArmed=false;clearTimeout(quickTimer);quickTimer=null;resetInline();$('arabic').value='';$('english').value='';learningOriginal='';recognitionBase='';clearAudio();$('originalSpeechText').textContent='';$('originalSpeech').style.display='none';$('originalSpeech').open=false;$('deliveries').classList.remove('show');$('deliveryList').innerHTML='';invalidate();renderProjects();notice('Draft cleared. Start speaking or type a new prompt.',true);$('arabic').focus();});
 $('translate').addEventListener('click',async()=>{if(inlineMode())return prepareInline();const arabic=$('arabic').value;if(!arabic.trim())return;busy=true;invalidate();renderProjects();$('translate').textContent='Crafting your English prompt…';const generation=++jobGeneration;freshPromptTimes();stage('Preparing English prompt');mark('promptStart');try{const r=await api('/api/translate',{arabic,original:learningOriginal});if(generation!==jobGeneration)return;if(r.replacements&&r.replacements.length&&!learningOriginal)learningOriginal=arabic;mark('prompt');stageDone('Prompt ready · '+timingSummary('prompt'));$('english').value=r.english;if(r.vocabulary)showVocabulary(r.vocabulary);notice(r.learningError||(r.selfLearning===false?'English prompt crafted. Self-learning is off; no new vocabulary was saved. The draft is ready for copying or automatic paste.':'English prompt crafted and personal vocabulary saved. The English prompt is ready. Shortcut recordings paste automatically into the original app.'),!r.learningError);if(r.notice)notice(tr(r.notice)+' The English draft is ready to review.',true);}catch(e){stageTimes.chain=false;if(generation===jobGeneration)stageDone('Prompt preparation failed after '+seconds(clock()-stageTimes.promptStart));notice(e.message);}finally{busy=false;update();renderProjects();$('translate').innerHTML='Prepare English prompt '+icon('arrow');}});
 async function beginPasteCapture(){
@@ -773,7 +775,7 @@ function renderHistory(){
   const stamp=new Date(entry.sentAt*1000),place=entry.destinations.map(where=>esc(tr(where.replace(/ · paste requested$/,'')))).join(' · '),state=historyBusy?'disabled':'';
   const text=entry.english.length>HISTORY_PREVIEW?`<details class="history-details"><summary dir="auto"><span class="history-preview">${esc(entry.english.slice(0,HISTORY_PREVIEW))}…</span><span class="history-more">${tr('اقرا الكل')}</span><span class="history-less">${tr('اقفل')}</span></summary><div class="history-prompt" dir="auto">${esc(entry.english)}</div></details>`:`<div class="history-prompt" dir="auto">${esc(entry.english)}</div>`;
   return `<article class="history-entry"><div class="history-meta"><time datetime="${esc(stamp.toISOString())}">${esc(stamp.toLocaleString(relayLocale,{dateStyle:'medium',timeStyle:'short'}))}</time><span class="history-destinations">${place}</span></div>${text}<div class="history-actions"><button class="text-btn" data-history-action="copy" data-history-id="${esc(entry.id)}" ${state}>${tr('نسخ')}</button><button class="text-btn" data-history-action="delete" data-history-id="${esc(entry.id)}" ${state}>${tr('حذف')}</button></div></article>`;
- }).join(''):`<div class="history-empty"><strong>${tr('لسه مفيش حاجة هنا.')}</strong>${nativeDesktop?`<p>${tr('دوس {key} في أي تطبيق واتكلم، والنص هيتلصق مكان ما كنت بتكتب.',{key:`<kbd class="keycap mono" dir="ltr">${esc(shortcutLabel)}</kbd>`})}</p>`:`<p>${tr('التسجيل بيشتغل من تطبيق الويندوز بس.')}</p>`}</div>`;
+ }).join(''):`<div class="history-empty"><strong>${tr('لسه مفيش حاجة هنا.')}</strong>${nativeDesktop?`<p>${tr('دوس {key} في أي تطبيق واتكلم، والنص هيتلصق مكان ما كنت بتكتب.',{key:`<kbd class="keycap mono" dir="ltr">${esc(shortcutLabel)}</kbd>`})}</p>`:`<p>${tr('التسجيل بيشتغل من تطبيق الكمبيوتر بس.')}</p>`}</div>`;
 }
 async function loadHistory(){try{const result=await api('/api/history');const same=historyLoaded&&JSON.stringify(result.entries)===JSON.stringify(historyItems);historyItems=result.entries;historyLoaded=true;$('historyMessage').textContent='';if(!same)renderHistory();}catch(e){$('historyMessage').textContent=e.message;}}
 window.relayHistoryChanged=()=>{if($('historyButton').getAttribute('aria-selected')==='true')loadHistory();};
@@ -782,7 +784,7 @@ async function changeHistory(path,data){historyBusy=true;renderHistory();try{his
 $('clearHistory').addEventListener('click',async()=>{if(historyBusy||!historyItems.length)return;if(await askConfirm(tr('تمسح السجل كله؟'),tr('كل النصوص المحفوظة هتتمسح من جهازك.'),tr('مسح الكل')))await changeHistory('/api/history/clear',{});});
 async function historyAction(action,id){
  if(historyBusy)return;const entry=historyItems.find(item=>item.id===id);if(!entry)return;
- if(action==='copy'){try{await navigator.clipboard.writeText(entry.english);notice(tr('اتنسخ.'),true);}catch{notice(tr('ما قدرتش أنسخ. افتح النص وانسخه بـ Ctrl + C.'));}return;}
+ if(action==='copy'){try{await navigator.clipboard.writeText(entry.english);notice(tr('اتنسخ.'),true);}catch{notice(tr('ما قدرتش أنسخ. افتح النص وانسخه بـ {copy}.'));}return;}
  if(action==='delete'&&await askConfirm(tr('تمسح النص ده؟'),tr('هيتمسح من السجل على جهازك.'),tr('مسح')))await changeHistory('/api/history/delete',{id});
 }
 $('historyList').addEventListener('click',event=>{const button=event.target.closest('[data-history-action]');if(button)historyAction(button.dataset.historyAction,button.dataset.historyId);});
@@ -824,13 +826,13 @@ function updateSpeechStatus(){
  $('wisprBadge').hidden=!flow;$('useWispr').hidden=flow;$('useWispr').disabled=locked;$('wisprLocate').hidden=!nativeDesktop;$('wisprLocate').disabled=locked;$('wisprOpen').disabled=locked;$('wisprOpen').textContent=wisprFlowInstalled?tr('افتح Wispr Flow'):tr('حمّل Wispr Flow');
  $('cohereBadge').hidden=!cohere;$('useCohere').hidden=cohere;$('useCohere').disabled=locked;
  $('cohereSettings').hidden=!cohere;$('cohereKey').disabled=locked;$('cohereSave').disabled=locked;$('cohereRemove').disabled=locked||!cohereConfigured;$('cohereRemove').hidden=!cohereConfigured;
- $('cohereKeyStatus').textContent=cohereConfigured?tr('فيه مفتاح محفوظ على حساب الويندوز ده. اكتب مفتاح تاني لو عايز تغيّره.'):tr('مفيش مفتاح محفوظ. ضيف مفتاحك عشان الاختيار ده يشتغل.');
+ $('cohereKeyStatus').textContent=cohereConfigured?tr('فيه مفتاح محفوظ على حسابك على الجهاز ده. اكتب مفتاح تاني لو عايز تغيّره.'):tr('مفيش مفتاح محفوظ. ضيف مفتاحك عشان الاختيار ده يشتغل.');
  $('speechStatus').textContent=flow?'Wispr Flow · desktop app':cohere?(cohereConfigured?'Cohere Arabic · online':'Cohere Arabic · key needed'):speechConfigured?`Local · ${speechModel||'Whisper'} · ${speechDevice}`:'Local speech · unavailable';
  $('engineSettings').hidden=flow||cohere;
  $('dictationHelp').textContent=flow?tr('Wispr Flow بيحوّل الكلام أونلاين بحسابك، والبرنامج بياخد النص بس.'):cohere?tr('Cohere بيحوّل العربي والإنجليزي أونلاين. الصوت بيتبعت لما توقف التسجيل.'):missingModel?tr('فولدر النموذج اتنقل أو اتمسح: {path}. حمّل نموذج أو اختار فولدر تاني.',{path:missingModel}):!speechConfigured?tr('عشان تبدأ، حمّل نموذج كلام أو اختار واحد عندك.'):setupInfo&&!setupInfo.gpu?tr('مفيش كارت NVIDIA، فالتحويل بيشتغل على المعالج وبياخد كام ثانية في كل جملة.'):tr('Whisper بيشتغل على جهازك، وصوتك مش بيخرج منه.');
  $('privacySummary').textContent=(flow?tr('Wispr Flow بيحوّل الصوت أونلاين. '):cohere?tr('Cohere بيحوّل الصوت أونلاين. '):tr('Whisper بيحوّل صوتك على جهازك. '))+(inlineMode()&&localTranslatorReady()?tr('والعبارات العربي بتترجم على جهازك لما ينفع.'):tr('والبرومبت بيتجهز بالنموذج اللي اخترته.'))+tr(' واللصق من غير Enter.');
  $('retryPrivacy').textContent=cohere?'Retry sends audio to Cohere again and uses its account limits.':'Retry runs locally. No API credits needed.';
- if(!busy&&!listening){$('recordTitle').textContent=flow?'Dictate with Wispr Flow.':'Start with your voice.';$('recordHint').textContent=flow?'Focus the transcript, hold Ctrl + Win, speak, then release. Use your custom Flow shortcut if different.':'Click the microphone to start. Click again to stop.';$('waveCaption').textContent=flow?'Dictation handled by Wispr Flow':'Ready when you are';}
+ if(!busy&&!listening){$('recordTitle').textContent=flow?'Dictate with Wispr Flow.':'Start with your voice.';$('recordHint').textContent=flow?'Focus the transcript and dictate using the shortcut configured in Wispr Flow.':'Click the microphone to start. Click again to stop.';$('waveCaption').textContent=flow?'Dictation handled by Wispr Flow':'Ready when you are';}
  renderSpeechModels();
 }
 function setProvider(value){dictationProvider=['wispr','cohere'].includes(value)?value:'whisper';try{localStorage.setItem('relay-dictation-provider',dictationProvider);}catch{}if(dictationProvider!=='whisper'&&setupPending){setupPending=false;api('/api/setup/skip',{}).catch(()=>{});}update();}
@@ -849,7 +851,7 @@ async function cohereWav(blob){
  for(let i=0;i<samples.length;i++){const sample=Math.max(-1,Math.min(1,samples[i]));view.setInt16(44+i*2,sample<0?sample*32768:sample*32767,true);}
  return new Blob([bytes],{type:'audio/wav'});
 }
-$('wisprFocus').addEventListener('click',()=>{if(busy||listening)return;(inlineMode()?$('english'):$('arabic')).focus();notice(inlineMode()?'Hold Ctrl + Win (or your Flow shortcut), speak, then release. Arabic phrases translate automatically; review the result before Send.':'Hold Ctrl + Win (or your Flow shortcut), speak, then release to insert text here. Review it before preparing the English prompt.',true);});
+$('wisprFocus').addEventListener('click',()=>{if(busy||listening)return;(inlineMode()?$('english'):$('arabic')).focus();notice(inlineMode()?'Dictate using the shortcut configured in Wispr Flow. Arabic phrases translate automatically; review the result before Send.':'Use the shortcut configured in Wispr Flow to insert text here. Review it before preparing the English prompt.',true);});
 $('wisprOpen').addEventListener('click',async()=>{if(busy||listening)return;busy=true;update();try{const result=await api('/api/wispr/open',{});wisprFlowInstalled=!!result.installed;notice(result.installed?tr('Wispr Flow اتفتح. كمّل إعداده أو سجّل الدخول لو طلب.'):tr('صفحة تحميل Wispr Flow اتفتحت. ثبّته وسجّل الدخول، وبعدها ارجع هنا.'),true);}catch(e){notice(e.message);}finally{busy=false;update();}});
 try{$('vocabulary').value=localStorage.getItem('relay-vocabulary')||'';}catch{}
 $('vocabulary').addEventListener('change',()=>{try{localStorage.setItem('relay-vocabulary',$('vocabulary').value);}catch{}});
@@ -1071,7 +1073,7 @@ $('retryAudio').addEventListener('click',transcribeRecording);
 function finishRecording(discard=false){if(!listening||recorder?.state!=='recording')return;discardAudio=discard;stageTimes.stop=clock();clearTimeout(recordTimer);recorder.stop();audioStream?.getTracks().forEach(t=>t.stop());}
 $('cancelRecording').addEventListener('click',()=>{pasteArmed=false;finishRecording(true);});
 $('stopRecording').addEventListener('click',()=>finishRecording());
-$('record').addEventListener('click',async()=>{if(dictationProvider==='wispr')return;if(busy)return;if(listening){finishRecording();return;}stageTimes={request:clock()};if(dictationProvider==='cohere'?!cohereConfigured:!speechConfigured){notice(dictationProvider==='cohere'?tr('ضيف مفتاح Cohere من تبويب النماذج الأول.'):tr('اختار نموذج كلام من تبويب النماذج الأول.'));if(quickCapture)window.pywebview?.api.show_main?.('models',csrf)?.catch?.(()=>{});return;}if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){notice(tr('التسجيل مش متاح على الجهاز ده.'));return;}busy=true;update();renderProjects();try{audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(t=>MediaRecorder.isTypeSupported(t));if(!mime)throw new Error(tr('مفيش صيغة تسجيل مناسبة.'));clearAudio();recognitionBase=(inlineMode()?$('english'):$('arabic')).value.trim();discardAudio=false;const chunks=[];cancelLiveStream();stageTimes.mic=clock();const live=await openLiveCapture(audioStream);recorder=new MediaRecorder(audioStream,{mimeType:mime,audioBitsPerSecond:64000});recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};recorder.onerror=()=>{discardAudio=true;cancelSpeechPreparation();cancelLiveStream();audioStream?.getTracks().forEach(t=>t.stop());clearTimeout(recordTimer);recordState(false);notice(tr('التسجيل وقف. جرّب تاني.'));};recorder.onstop=()=>{audioStream?.getTracks().forEach(t=>t.stop());clearTimeout(recordTimer);recordState(false);if(discardAudio){cancelSpeechPreparation();cancelLiveStream();notice(tr('اتلغى التسجيل.'),true);return;}audioBlob=new Blob(chunks,{type:mime});audioUrl=URL.createObjectURL(audioBlob);$('downloadAudio').href=audioUrl;$('downloadAudio').download=mime.startsWith('audio/mp4')?'dictation.mp4':'dictation.webm';if(!audioBlob.size||audioBlob.size>24*1024*1024){cancelSpeechPreparation();cancelLiveStream();$('voiceRetry').style.display='flex';notice(tr('التسجيل كبير أوي. سجّل حاجة أقصر.'));return;}transcribeRecording();};recorder.start(1000);stageTimes.recording=clock();if(live){liveStream=live;startLiveJob(live);}prepareSpeech();busy=false;recordState(true);watchLevel(audioStream);renderProjects();recordTimer=setTimeout(()=>finishRecording(),300000);}catch(e){audioStream?.getTracks().forEach(t=>t.stop());busy=false;recordState(false);renderProjects();notice(e.name==='NotAllowedError'?tr('البرنامج محتاج إذن المايك. اسمح بيه من إعدادات الويندوز.'):e.message);}});
+$('record').addEventListener('click',async()=>{if(dictationProvider==='wispr')return;if(busy)return;if(listening){finishRecording();return;}stageTimes={request:clock()};if(dictationProvider==='cohere'?!cohereConfigured:!speechConfigured){notice(dictationProvider==='cohere'?tr('ضيف مفتاح Cohere من تبويب النماذج الأول.'):tr('اختار نموذج كلام من تبويب النماذج الأول.'));if(quickCapture)window.pywebview?.api.show_main?.('models',csrf)?.catch?.(()=>{});return;}if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){notice(tr('التسجيل مش متاح على الجهاز ده.'));return;}busy=true;update();renderProjects();try{audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(t=>MediaRecorder.isTypeSupported(t));if(!mime)throw new Error(tr('مفيش صيغة تسجيل مناسبة.'));clearAudio();recognitionBase=(inlineMode()?$('english'):$('arabic')).value.trim();discardAudio=false;const chunks=[];cancelLiveStream();stageTimes.mic=clock();const live=await openLiveCapture(audioStream);recorder=new MediaRecorder(audioStream,{mimeType:mime,audioBitsPerSecond:64000});recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};recorder.onerror=()=>{discardAudio=true;cancelSpeechPreparation();cancelLiveStream();audioStream?.getTracks().forEach(t=>t.stop());clearTimeout(recordTimer);recordState(false);notice(tr('التسجيل وقف. جرّب تاني.'));};recorder.onstop=()=>{audioStream?.getTracks().forEach(t=>t.stop());clearTimeout(recordTimer);recordState(false);if(discardAudio){cancelSpeechPreparation();cancelLiveStream();notice(tr('اتلغى التسجيل.'),true);return;}audioBlob=new Blob(chunks,{type:mime});audioUrl=URL.createObjectURL(audioBlob);$('downloadAudio').href=audioUrl;$('downloadAudio').download=mime.startsWith('audio/mp4')?'dictation.mp4':'dictation.webm';if(!audioBlob.size||audioBlob.size>24*1024*1024){cancelSpeechPreparation();cancelLiveStream();$('voiceRetry').style.display='flex';notice(tr('التسجيل كبير أوي. سجّل حاجة أقصر.'));return;}transcribeRecording();};recorder.start(1000);stageTimes.recording=clock();if(live){liveStream=live;startLiveJob(live);}prepareSpeech();busy=false;recordState(true);watchLevel(audioStream);renderProjects();recordTimer=setTimeout(()=>finishRecording(),300000);}catch(e){audioStream?.getTracks().forEach(t=>t.stop());busy=false;recordState(false);renderProjects();notice(e.name==='NotAllowedError'?tr('البرنامج محتاج إذن المايك. اسمح بيه من إعدادات الخصوصية في النظام.'):e.message);}});
 window.addEventListener('beforeunload',()=>{cancelSpeechPreparation();cancelLiveStream();clearTimeout(recordTimer);audioStream?.getTracks().forEach(t=>t.stop());if(audioUrl)URL.revokeObjectURL(audioUrl);});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!busy)api('/api/status').then(s=>{csrf=s.csrf;wisprFlowInstalled=!!s.wisprFlowInstalled;cohereConfigured=!!s.cohereConfigured;selfLearningEnabled=s.selfLearning!==false;autoSpellingEnabled=s.autoSpelling===true;update();if(s.connected!==connected)refresh();}).catch(()=>{});});
 let speechModel=null,speechDevice='GPU',missingModel=null,SETUP_POLL=1000,setupOffered=false,setupPending=false,setupInfo=null,setupProgress=null,setupLast=null,setupSpeed='',setupTimer=null,speechRows='';
@@ -1155,8 +1157,8 @@ $('promptCustom').addEventListener('keydown',e=>{if(e.key!=='Enter')return;e.pre
 $('promptEffort').addEventListener('change',()=>choosePrompt({...promptChoice,effort:$('promptEffort').value}));
 async function locateTool(kind){try{const path=await window.pywebview.api.pick_file(csrf);if(!path)return;await api('/api/tool-path',{kind,path});await loadTranslators();if(kind==='wispr')await refresh();notice(tr('اتحفظ مكان {tool}.',{tool:TOOL_NAMES[kind]}),true);}catch(e){notice(e.message);}}
 $('codexBrowse').addEventListener('click',()=>locateTool('codex'));$('claudeBrowse').addEventListener('click',()=>locateTool('claude'));$('wisprLocate').addEventListener('click',()=>locateTool('wispr'));
-function renderUpdate(u){if(!u)return;$('updateMode').value=u.mode;$('installOnQuit').checked=!!u.installOnQuit;const version=u.failed||u.ready||u.available;$('updateBanner').hidden=!version;if(!version)return;
- $('updateNotes').href=$('updateManual').href=u.releaseUrl;$('updateNotesItem').hidden=!!u.failed;$('updateManualItem').hidden=!u.failed;$('updateInstallItem').hidden=!(u.failed||u.ready);
+function renderUpdate(u){if(!u)return;if(u.manualOnly){$('updateMode').querySelector('[value=auto]').hidden=true;$('installOnQuit').closest('label').hidden=true;}$('updateMode').value=u.mode;$('installOnQuit').checked=!!u.installOnQuit;const version=u.failed||u.ready||u.available;$('updateBanner').hidden=!version;if(!version)return;
+ $('updateNotes').href=$('updateManual').href=u.releaseUrl;$('updateNotesItem').hidden=!!u.failed;$('updateManualItem').hidden=!(u.failed||u.manualOnly);$('updateInstallItem').hidden=!(u.failed||u.ready);
  $('updateInstall').textContent=u.failed?tr('جرّب تاني'):tr('أعد التشغيل وحدّث');$('updateText').textContent=u.failed?tr('التحديث لـ {version} ما اتثبتش.',{version:u.failed}):u.ready?tr('Nuvra {version} جاهز',{version:u.ready}):tr('Nuvra {version} متاح',{version:u.available});}
 $('updateInstall').addEventListener('click',async()=>{if(busy||listening)return;try{await api('/api/update/install',{});notice(tr('بثبّت التحديث، والبرنامج هيفتح تاني لما يخلص.'),true);await window.pywebview?.api?.quit(csrf);}catch(e){notice(e.message);}});
 async function saveUpdatePreferences(){try{renderUpdate(await api('/api/update/preferences',{mode:$('updateMode').value,installOnQuit:$('installOnQuit').checked}));}catch(e){notice(e.message);}}
@@ -1303,6 +1305,9 @@ function scheduleQuickPrompt(){
 $('arabic').addEventListener('compositionstart',()=>{if(quickCapture){quickComposing=true;clearTimeout(quickTimer);quickTimer=null;}});
 $('arabic').addEventListener('compositionend',()=>{quickComposing=false;scheduleQuickPrompt();});
 function showShortcut(s){
+ relayKeys=s.platform==='darwin'?{copy:'Command + C',paste:'Command + V',finish:'Return'}:{copy:'Ctrl + C',paste:'Ctrl + V',finish:'Enter'};
+ for(const option of $('shortcutChoice').options||[])if(s.choices?.[option.value])option.textContent=s.choices[option.value];
+ $('captureKeysHelp').textContent=tr('أثناء التسجيل: {finish} لإنهاء التسجيل واللصق، وEsc للإلغاء.');
  shortcutLabel=s.label||'Ctrl + Alt + Space';$('shortcutChoice').value=s.choice||'ctrl-alt-space';$('topShortcut').textContent=shortcutLabel;
  $('shortcutStatus').hidden=quickCapture||!s.error&&!!s.available;$('shortcutStatus').textContent=s.available?'':tr(s.error)||tr('اختصار التسجيل بيشتغل…');
  $('shortcutHelp').textContent=tr(s.error)||tr('سيب البرنامج مفتوح أو متصغّر. الاختصار بيبدأ التسجيل وبيوقفه. مع Wispr Flow، استخدم اختصاره هو بعد ما الشريط يظهر.');
@@ -1335,7 +1340,7 @@ async function endQuick(){
  if(!text){const canRetry=!!audioBlob&&dictationProvider!=='wispr';quickSay(quickMessage||tr('ما سمعتش حاجة.'),{retry:canRetry,stay:canRetry});return;}
  const why=quickMessage||(!pasteAvailable?tr('مفيش تطبيق ألصق فيه.'):inlineMode()?tr('الترجمة ما كملتش.'):tr('ما قدرتش ألصق.'));
  let kept={};try{kept=await window.pywebview.api.keep_text({text,captureId},csrf);}catch(e){console.warn('The words could not be kept:',e.message);}
- quickSay(why+' '+(kept.copied&&kept.saved?tr('اتنسخ وهتلاقيه في السجل.'):kept.copied?tr('اتنسخ، الصق بـ Ctrl + V.'):kept.saved?tr('هتلاقيه في السجل.'):tr('ما قدرتش أحفظه.')));
+ quickSay(why+' '+(kept.copied&&kept.saved?tr('اتنسخ وهتلاقيه في السجل.'):kept.copied?tr('اتنسخ، الصق بـ {paste}.'):kept.saved?tr('هتلاقيه في السجل.'):tr('ما قدرتش أحفظه.')));
 }
 function updateQuickSurface(){
  if(!quickCapture)return;

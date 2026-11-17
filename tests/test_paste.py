@@ -12,6 +12,9 @@ from arabic_relay import desktop, inline, paste, paths
 
 
 class FakeWindows:
+    def close_clipboard(self):
+        self.user.CloseClipboard()
+
     def __init__(self):
         self.user = SimpleNamespace(CloseClipboard=Mock())
         self.seq = 10

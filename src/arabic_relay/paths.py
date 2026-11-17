@@ -4,7 +4,9 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parent
-DATA = Path(os.environ.get('ARABIC_RELAY_DATA_DIR') or Path(os.environ.get('LOCALAPPDATA') or Path.home()) / 'Arabic Relay')
+DEFAULT_DATA = (Path.home() / 'Library/Application Support/Nuvra' if sys.platform == 'darwin'
+                else Path(os.environ.get('LOCALAPPDATA') or Path.home()) / 'Arabic Relay')
+DATA = Path(os.environ.get('ARABIC_RELAY_DATA_DIR') or DEFAULT_DATA)
 DATA.mkdir(parents=True, exist_ok=True)
 
 

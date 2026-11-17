@@ -22,6 +22,26 @@ const {boot,flush}=require('./test_translation_ui.cjs');
  const main=boot();await flush();let prevented=false;
  main.context.quickKeydown({key:'Enter',preventDefault(){prevented=true;}});assert.equal(prevented,false);
 
+ // Native shortcut labels and clipboard hints match the platform in both languages.
+ for(const language of ['en','ar']){
+  const labels=boot({language});await flush();
+  vm.runInContext('historyLoaded=false',labels.context);
+  const choices={'ctrl-alt-space':'Control + Option + Space','ctrl-alt-r':'Control + Option + R','ctrl-shift-space':'Control + Shift + Space'};
+  labels.nodes.get('shortcutChoice').options=Object.keys(choices).map(value=>({value}));
+  labels.context.showShortcut({platform:'darwin',available:true,choice:'ctrl-alt-r',label:choices['ctrl-alt-r'],choices});
+  assert.equal(labels.nodes.get('topShortcut').textContent,'Control + Option + R');
+  assert.equal(labels.nodes.get('shortcutChoice').value,'ctrl-alt-r');
+  assert.deepEqual(labels.nodes.get('shortcutChoice').options.map(o=>o.textContent),Object.values(choices));
+  assert.match(labels.nodes.get('captureKeysHelp').textContent,/Return/);
+  assert.match(labels.context.tr('اتنسخ، الصق بـ {paste}.'),/Command \+ V/);
+  assert.match(labels.context.tr('ما قدرتش أنسخ. افتح النص وانسخه بـ {copy}.'),/Command \+ C/);
+  await labels.nodes.get('copy').click();
+  assert.match(labels.nodes.get('notice').textContent,/Command \+ C/);
+  labels.context.showShortcut({platform:'win32',available:true,label:'Ctrl + Alt + Space'});
+  assert.match(labels.nodes.get('captureKeysHelp').textContent,/Enter/);
+  assert.match(labels.context.tr('اتنسخ، الصق بـ {paste}.'),/Ctrl \+ V/);
+ }
+
  // Flow can finish immediately instead of waiting for the typing pause, but respects IME composition.
  const flow=boot({quick:true,provider:'wispr',translate:{english:'Keep React.'}});await flush();
  await flow.context.window.relayQuickToggle();flow.nodes.get('flowCapture').value='خلي React';

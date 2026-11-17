@@ -1,4 +1,4 @@
-"""Windows desktop host: WinForms window with embedded WebView2."""
+"""Native desktop host: WebView2 on Windows and WKWebView on macOS."""
 import ctypes
 import json
 import logging
@@ -19,9 +19,12 @@ import webview
 from . import diagnostics, server, locate, paths, speech, store, t3, updates, paste, history, inline
 from .hotkey import RecordingHotkey, CaptureHotkeys
 
+if sys.platform == 'darwin':
+    from .macos import RecordingHotkey, CaptureHotkeys
+
 
 PILL = {'capture': (147, 40), 'message': (400, 60)}   # logical pixels; the page's pill fills the window exactly
-FRAME = 16      # WinForms takes this much off a frameless window's requested size
+FRAME = 0 if sys.platform == 'darwin' else 16  # WinForms frameless window adjustment
 HISTORY_KEPT = 'اتنسخ، ما اتلصقش'
 
 
@@ -29,6 +32,8 @@ def see_through(window):
     """Windows paints a default backdrop behind WebView2's transparent page. Turning it off and extending the frame over
     the whole window lets the page's own alpha reach the desktop, so the pill has smooth edges and nothing around it.
     If any of this fails, a grey box shows behind the pill and recording still works."""
+    if sys.platform == 'darwin':
+        return  # Cocoa implements transparent windows directly.
     try:
         import System
         from System.Drawing import Color
@@ -50,6 +55,8 @@ def leave_keyboard_alone(window):
     """The pill shows while the user's app stays in front, so keys typed during a recording still reach that app.
     pywebview activates a transparent window whatever its focus option says, so that one call is switched off here.
     If this fails, the pill takes the keyboard while it is open and the paste still gives it back."""
+    if sys.platform == 'darwin':
+        return  # Cocoa's canBecomeKeyWindow respects focus=False.
     try:
         window.native.Activate = lambda: None
     except Exception:
@@ -58,6 +65,13 @@ def leave_keyboard_alone(window):
 
 def take_keyboard(window):
     """Wispr Flow types into the pill, so with Flow alone the pill needs the keyboard."""
+    if sys.platform == 'darwin':
+        from PyObjCTools import AppHelper
+        def apply():
+            window.focus = window.native.focus = True
+            window.native.makeKeyAndOrderFront_(None)
+        AppHelper.callAfter(apply)
+        return
     import System
     native = window.native
 
@@ -117,7 +131,7 @@ class QuickCapture:
                 screens = webview.screens
                 screen = next((s for s in screens if s.x == 0 and s.y == 0), screens[0])
                 # WinForms reports physical bounds; create_window takes DPI-scaled units.
-                scale = ctypes.windll.user32.GetDpiForSystem() / 96
+                scale = 1 if sys.platform == 'darwin' else ctypes.windll.user32.GetDpiForSystem() / 96
                 screen_width, screen_height = int(screen.width / scale), int(screen.height / scale)
                 self.screen_bounds = (int(screen.x / scale), int(screen.y / scale), screen_width, screen_height)
                 self.stage = 'capture'
@@ -291,7 +305,9 @@ class DesktopApi:
         if token != server.CSRF or not self._capture:
             raise ValueError('Invalid request.')
         key = self._capture.hotkey
-        return {'available': key.registered, 'error': key.error, 'choice': key.choice, 'label': key.label}
+        return {'available': key.registered, 'error': key.error, 'choice': key.choice, 'label': key.label,
+                'platform': sys.platform,
+                'choices': {choice: binding[0] for choice, binding in RecordingHotkey.CHOICES.items()}}
 
     def set_shortcut(self, choice, token):
         if token != server.CSRF or not self._capture or choice not in RecordingHotkey.CHOICES:
@@ -353,11 +369,15 @@ class DesktopApi:
         """Browse… for Codex, Claude Code or Wispr Flow: one .exe."""
         if token != server.CSRF:
             raise ValueError('Invalid file request.')
-        chosen = webview.windows[0].create_file_dialog(webview.FileDialog.OPEN, file_types=('Programs (*.exe)',))
+        types = ('All files (*.*)',) if sys.platform == 'darwin' else ('Programs (*.exe)',)
+        chosen = webview.windows[0].create_file_dialog(webview.FileDialog.OPEN, file_types=types)
         return chosen[0] if chosen else None
 
 
 def run():
+    if sys.platform == 'darwin':
+        from .macos import configure_webview
+        configure_webview()
     with store.database():
         pass
     if getattr(sys, 'frozen', False):  # a source checkout never replaces itself
@@ -372,8 +392,9 @@ def run():
                              background_color='#08090a', text_select=True)
         window.events.closed += capture.stop
         window.events.loaded += speech.prewarm   # only when the user asked for it; never blocks the window
-        webview.start(capture.hotkey.start, gui='edgechromium', private_mode=False,
-                      storage_path=str(paths.DATA / 'NativeWebView'), icon=str(server.ROOT / 'assets/relay.ico'))
+        webview.start(capture.hotkey.start, gui='cocoa' if sys.platform == 'darwin' else 'edgechromium', private_mode=False,
+                      storage_path=str(paths.DATA / 'NativeWebView'),
+                      icon=str(server.ROOT / ('assets/icon.png' if sys.platform == 'darwin' else 'assets/relay.ico')))
     finally:
         capture.stop()
         speech.cancel_preparation()
@@ -398,6 +419,17 @@ def instance_name():
 def single_instance(name=r'Local\ArabicRelay.Window'):
     """True for the first window of this Windows user; the handle lives as long as the process."""
     global MUTEX
+    if sys.platform == 'darwin':
+        import fcntl
+        import hashlib
+        lock = open(paths.DATA / (hashlib.sha256(name.encode()).hexdigest()[:16] + '.lock'), 'a')
+        try:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            lock.close()
+            return False
+        MUTEX = lock  # The OS releases the lock when this process exits.
+        return True
     kernel = ctypes.WinDLL('kernel32', use_last_error=True)
     kernel.CreateMutexW.restype = ctypes.c_void_p
     handle = kernel.CreateMutexW(None, False, name)
@@ -409,6 +441,9 @@ def single_instance(name=r'Local\ArabicRelay.Window'):
 
 
 def focus_window(pid):
+    if sys.platform == 'darwin':
+        from .macos import focus_window as focus
+        return focus(pid)
     user32 = ctypes.windll.user32
     found = []
 
@@ -452,5 +487,12 @@ def main():
     except Exception as error:
         logging.exception('Desktop startup failed')
         diagnostics.record_crash(traceback.format_exc())
-        ctypes.windll.user32.MessageBoxW(None, str(error), 'Nuvra', 0x10)
+        if sys.platform == 'darwin':
+            import AppKit
+            alert = AppKit.NSAlert.alloc().init()
+            alert.setMessageText_('Nuvra could not start')
+            alert.setInformativeText_(str(error))
+            alert.runModal()
+        else:
+            ctypes.windll.user32.MessageBoxW(None, str(error), 'Nuvra', 0x10)
         sys.exit(1)

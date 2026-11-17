@@ -3,6 +3,7 @@ import ctypes
 from ctypes import wintypes as w
 from dataclasses import dataclass
 import os
+import sys
 import threading
 import time
 
@@ -183,6 +184,9 @@ class Windows:
     def sequence(self):
         return self.user.GetClipboardSequenceNumber()
 
+    def close_clipboard(self):
+        self.user.CloseClipboard()
+
     def snapshot(self):
         rows, size, fmt = [], 0, 0
         while True:
@@ -270,7 +274,11 @@ class Paster:
 
     def windows(self):
         if self.backend is None:
-            self.backend = Windows()
+            if sys.platform == 'darwin':
+                from .macos import MacOS
+                self.backend = MacOS()
+            else:
+                self.backend = Windows()
         return self.backend
 
     def capture(self):
@@ -297,7 +305,7 @@ class Paster:
                     win.write(snapshot)
                 raise
             finally:
-                win.user.CloseClipboard()
+                win.close_clipboard()
             # Windows commits clipboard changes on CloseClipboard, not necessarily on SetClipboardData.
             inserted = win.sequence()
             try:
@@ -332,7 +340,7 @@ class Paster:
         try:
             win.put_text(text)
         finally:
-            win.user.CloseClipboard()
+            win.close_clipboard()
 
     def restore(self, snapshot, inserted):
         win = self.windows()
@@ -341,7 +349,7 @@ class Paster:
             if win.sequence() == inserted:
                 win.write(snapshot)
         finally:
-            win.user.CloseClipboard()
+            win.close_clipboard()
 
     def restore_and_release(self, snapshot, inserted):
         try:

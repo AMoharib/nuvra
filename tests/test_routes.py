@@ -122,7 +122,7 @@ class Routes(unittest.TestCase):
         connection.request('GET', '/api/status', headers={'Origin': server.ORIGIN})
         body = json.loads(connection.getresponse().read())
         connection.close()
-        self.assertEqual(set(body['update']), {'mode', 'installOnQuit', 'available', 'ready', 'failed', 'releaseUrl'})
+        self.assertEqual(set(body['update']), {'mode', 'installOnQuit', 'available', 'ready', 'failed', 'releaseUrl', 'manualOnly'})
 
     def test_setup_routes_are_handled(self):
         for method, route in (('GET', '/api/setup'), ('GET', '/api/setup/progress'), ('POST', '/api/setup/download'),

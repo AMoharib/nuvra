@@ -7,7 +7,7 @@ const flush=async(times=8)=>{for(let i=0;i<times;i++)await new Promise(resolve=>
 
 function boot({status={},replies={}}={}){
  const nodes=new Map(),requests=[],clipboard=[],opened=[],calls=[];
- function element(){return {value:'',disabled:false,hidden:false,checked:false,textContent:'',innerHTML:'',style:{setProperty(){}},dataset:{},classList:{toggle(){},remove(){},add(){}},listeners:{},addEventListener(name,fn){this.listeners[name]=fn;},dispatchEvent(event){return this.listeners[event.type]?.(event);},setAttribute(){},removeAttribute(){},querySelector(){return element();},append(){},after(){},remove(){},focus(){},showModal(){this.open=true;},close(){this.open=false;this.listeners.close?.();},click(){return this.listeners.click?.();}};}
+ function element(){return {value:'',disabled:false,hidden:false,checked:false,textContent:'',innerHTML:'',style:{setProperty(){}},dataset:{},classList:{toggle(){},remove(){},add(){}},listeners:{},addEventListener(name,fn){this.listeners[name]=fn;},dispatchEvent(event){return this.listeners[event.type]?.(event);},setAttribute(){},removeAttribute(){},querySelector(selector){this.children??=new Map();if(!this.children.has(selector))this.children.set(selector,element());return this.children.get(selector);},closest(){return this.parent??=element();},append(){},after(){},remove(){},focus(){},showModal(){this.open=true;},close(){this.open=false;this.listeners.close?.();},click(){return this.listeners.click?.();}};}
  for(const match of html.matchAll(/id="([^"]+)"/g))nodes.set(match[1],element());
  for(const match of html.matchAll(/<[^>]*\sid="([^"]+)"[^>]*>/g))if(/\shidden[\s>]/.test(match[0]))nodes.get(match[1]).hidden=true;
  const context=vm.createContext({console,Blob,Map,Set,JSON,Event:class{constructor(type){this.type=type;}},encodeURIComponent,decodeURIComponent,queueMicrotask,setTimeout,clearTimeout,
@@ -99,6 +99,17 @@ function boot({status={},replies={}}={}){
  assert.equal(n.get('updateText').textContent,'Nuvra 0.2.0 متاح');
  assert.equal(n.get('updateInstallItem').hidden,true);
  assert.equal(n.get('updateNotesItem').hidden,false);
+
+ // macOS offers a manual download and hides unsupported automatic installation.
+ app=boot({status:{update:update({mode:'notify',manualOnly:true,installOnQuit:false})}});
+ await flush();
+ n=app.nodes;
+ assert.equal(n.get('updateMode').querySelector('[value=auto]').hidden,true);
+ assert.equal(n.get('installOnQuit').closest('label').hidden,true);
+ assert.equal(n.get('updateManualItem').hidden,false);
+ assert.equal(n.get('updateManual').href,url);
+ assert.equal(n.get('updateInstallItem').hidden,true);
+ assert.equal(app.posted('/api/update/install').length,0);
 
  // A failed install: Retry and Download manually.
  app=boot({status:{update:update({available:null,failed:'0.2.0',ready:'0.2.0'})},replies:{'/api/update/install':{installing:'0.2.0'}}});
