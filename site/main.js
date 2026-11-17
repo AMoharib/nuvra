@@ -121,23 +121,10 @@ function render() {
   if (!reduceMotion) { answerText.classList.remove('is-new'); void answerText.offsetWidth; answerText.classList.add('is-new'); }
 }
 
-// Keep the sentence on one line: shrink the type for a long sentence, down to a floor, then let it scroll.
-const measure = document.createElement('canvas').getContext('2d');
-function fitInput() {
-  input.style.fontSize = '';
-  const cs = getComputedStyle(input);
-  const base = parseFloat(cs.fontSize);
-  measure.font = `${cs.fontWeight} ${base}px ${cs.fontFamily}`;
-  const width = measure.measureText(input.value || ' ').width;
-  const room = input.clientWidth;
-  if (width > room) input.style.fontSize = `${Math.max(base * 0.55, Math.floor(base * (room / width) * 0.97))}px`;
-}
-
 if (input) {
-  input.addEventListener('input', () => { fitInput(); render(); });
+  input.addEventListener('input', render);
   exampleButtons.forEach((b) => b.addEventListener('click', () => {
     input.value = EXAMPLES[+b.dataset.example].ar;
-    fitInput();
     render();
   }));
   modeButtons.forEach((b) => b.addEventListener('click', () => {
@@ -156,9 +143,3 @@ document.addEventListener('keydown', (e) => {
   input.setSelectionRange(input.value.length, input.value.length);
   input.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
 });
-
-if (input) {
-  window.addEventListener('resize', fitInput);
-  if (document.fonts) document.fonts.ready.then(fitInput);
-  fitInput();
-}
