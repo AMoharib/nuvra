@@ -252,7 +252,8 @@ def open_wispr_flow():
     executable = locate.tool_path('wispr')
     with locate.external_runtime():
         if executable:
-            subprocess.Popen([str(executable)], creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+            command = ['open', '-a', str(executable)] if sys.platform == 'darwin' else [str(executable)]
+            subprocess.Popen(command, creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
         elif not webbrowser.open('https://wisprflow.ai/downloads'):
             raise ValueError('افتح wisprflow.ai/downloads في المتصفح وثبّت Wispr Flow.')
     return {'installed': executable is not None}

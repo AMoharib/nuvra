@@ -51,7 +51,8 @@ def start_logging():
 def scrub(text):
     """Paths under the user's home folder show `<user>` instead of the Windows user name."""
     pattern = r'([A-Za-z]:[\\/]+Users[\\/]+)' + re.escape(Path.home().name) + r'(?![\w.-])'
-    return re.sub(pattern, r'\1<user>', text, flags=re.IGNORECASE)
+    text = re.sub(pattern, r'\1<user>', text, flags=re.IGNORECASE)
+    return text.replace(str(Path.home()) + '/', '<user>/')
 
 
 def tool_line(name, kind, version=True):
@@ -75,7 +76,7 @@ def report():
     gpu = models.gpu_info()
     voice = speech.status()
     lines = [f"Nuvra {__version__} ({'installed' if getattr(sys, 'frozen', False) else 'source'})",
-             f'Windows {platform.version()} ({platform.machine()})', f'Python {platform.python_version()}',
+             f'{platform.system()} {platform.version()} ({platform.machine()})', f'Python {platform.python_version()}',
              f"GPU: {gpu['name']}, {gpu['vramGb']} GB, driver {gpu['driver']}" if gpu else 'GPU: none found',
              f"Speech: {voice['speechDevice']} · {voice['speechModel'] or 'no model'} · {voice['modelPath'] or 'not set'}",
              tool_line('Codex', 'codex'), tool_line('Claude Code', 'claude'), tool_line('Wispr Flow', 'wispr', version=False),
@@ -113,3 +114,45 @@ def self_test():
         worker = False
     print(json.dumps({'status': status, 'worker': worker, 'version': __version__}), flush=True)
     return 0 if status and worker else 1
+
+
+def self_test_gui():
+    """Check the native webview and recording APIs without accessing the microphone or keyboard."""
+    import webview
+    if sys.platform == 'darwin':
+        from .macos import configure_webview
+        configure_webview()
+    from http.server import BaseHTTPRequestHandler
+    from .server import Server
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            body = b'<!doctype html><title>Nuvra self-test</title><p>Checking recording APIs.</p>'
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        def log_message(self, *args):
+            pass
+    httpd = Server(('127.0.0.1', 0), Handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    window = webview.create_window('Nuvra self-test', f'http://127.0.0.1:{httpd.server_port}')
+    result = {}
+    def inspect():
+        try:
+            if not window.events.loaded.wait(30):
+                raise RuntimeError('The native webview did not load.')
+            result.update(window.evaluate_js('({secure: window.isSecureContext, '
+                          'microphone: !!navigator.mediaDevices?.getUserMedia, '
+                          'recorder: typeof MediaRecorder === "function"})'))
+        except Exception as error:
+            result['error'] = str(error)
+        finally:
+            window.destroy()
+    try:
+        webview.start(inspect, gui='cocoa' if sys.platform == 'darwin' else 'edgechromium')
+    finally:
+        httpd.shutdown()
+        httpd.server_close()
+    print(json.dumps(result), flush=True)
+    return 0 if all(result.get(key) for key in ('secure', 'microphone', 'recorder')) else 1

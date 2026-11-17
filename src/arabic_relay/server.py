@@ -6,6 +6,7 @@ import logging
 import os
 import secrets
 import socket
+from socketserver import TCPServer
 import sys
 import time
 import urllib.error
@@ -250,7 +251,12 @@ class Server(ThreadingHTTPServer):
     def server_bind(self):
         if hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):
             self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
-        super().server_bind()
+        if sys.platform == 'darwin':
+            # The server is loopback-only. Reverse DNS can stall frozen macOS startup.
+            TCPServer.server_bind(self)
+            self.server_name, self.server_port = self.server_address
+        else:
+            super().server_bind()
 
 
 def bind(port, fallback=True):

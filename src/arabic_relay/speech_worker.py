@@ -21,6 +21,14 @@ ERRORS = ('AUDIO_TOO_LONG', 'INVALID_AUDIO', 'MULTILINGUAL_REQUIRED', 'RETRY_TOO
 
 
 def watch_parent(pid):
+    if sys.platform == 'darwin':
+        # POSIX workers are direct children; reparenting means the desktop exited.
+        def wait():
+            while os.getppid() == pid:
+                time.sleep(.5)
+            os._exit(90)
+        threading.Thread(target=wait, daemon=True).start()
+        return
     kernel = ctypes.WinDLL('kernel32', use_last_error=True)
     kernel.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
     kernel.OpenProcess.restype = wintypes.HANDLE
@@ -188,6 +196,10 @@ def setup_runtime(parent, device):
     os.environ['HF_HUB_OFFLINE'] = '1'
     os.environ['HF_HUB_DISABLE_TELEMETRY'] = '1'
     os.environ['DO_NOT_TRACK'] = '1'
+    if sys.platform == 'darwin':
+        if device != 'cpu':
+            raise ValueError('macOS local speech supports CPU processing only.')
+        return None
     if not ctypes.windll.kernel32.SetDefaultDllDirectories(0x1000):
         raise ctypes.WinError()
     if device == 'cuda':

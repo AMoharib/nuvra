@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import threading
 import time
 import urllib.request
@@ -58,10 +59,14 @@ def verify(file, signature, public_key=None):
 
 def mode():
     value = str(store.get_setting('update_mode', 'auto'))
+    if sys.platform == 'darwin':
+        return 'off' if value == 'off' else 'notify'
     return value if value in MODES else 'auto'
 
 
 def install_on_quit_enabled():
+    if sys.platform == 'darwin':
+        return False
     return str(store.get_setting('update_install_on_quit', 1)) == '1'
 
 
@@ -83,6 +88,8 @@ def read_json(name):
 
 def ready():
     """The verified download waiting to install, or None."""
+    if sys.platform == 'darwin':
+        return None
     info = read_json('ready.json')
     name = str((info or {}).get('file', ''))
     if not info or not name or Path(name).name != name or not (folder() / name).is_file():
@@ -93,6 +100,7 @@ def ready():
 def state():
     info = ready()
     return {'mode': mode(), 'installOnQuit': install_on_quit_enabled(), 'available': STATE['available'],
+            'manualOnly': sys.platform == 'darwin',
             'ready': info['version'] if info else None, 'failed': STATE['failed'],
             'releaseUrl': release_page(STATE['releaseUrl'] or (info or {}).get('url'))}
 
@@ -107,6 +115,8 @@ def small_download(url):
 
 
 def download(release, version):
+    if sys.platform == 'darwin':
+        raise ValueError('Download the macOS DMG from the release page and replace Nuvra in Applications.')
     name = f'ArabicRelay-Setup-{version}.exe'
     target, signature_file = folder() / name, folder() / (name + '.sig')
     for old in folder().iterdir():
@@ -161,6 +171,8 @@ def busy():
 
 
 def install(relaunch):
+    if sys.platform == 'darwin':
+        raise ValueError('Download the macOS DMG from the release page and replace Nuvra in Applications.')
     info = ready()
     if not info:
         raise ValueError('مفيش تحديث جاهز.')

@@ -10,7 +10,10 @@ permissions:
   contents: write
 
 jobs:
+  macos:
+    uses: ./.github/workflows/macos.yml
   release:
+    needs: macos
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -63,6 +66,12 @@ jobs:
           $version = "$env:GITHUB_REF_NAME".Substring(1)
           $name = "ArabicRelay-Setup-$version.exe"
           "$((Get-FileHash "dist\$name" -Algorithm SHA256).Hash.ToLower())  $name" | Set-Content dist\SHA256SUMS.txt -Encoding ascii
+      - name: Collect macOS assets
+        uses: actions/download-artifact@v4
+        with:
+          pattern: macos-*
+          path: dist/macos
+          merge-multiple: true
       - name: Draft release
         shell: bash
         env:
@@ -70,4 +79,4 @@ jobs:
         run: |
           version="${GITHUB_REF_NAME#v}"
           gh release create "$GITHUB_REF_NAME" --draft --title "Nuvra $version" --generate-notes \
-            "dist/ArabicRelay-Setup-$version.exe" dist/SHA256SUMS.txt
+            "dist/ArabicRelay-Setup-$version.exe" dist/SHA256SUMS.txt dist/macos/*

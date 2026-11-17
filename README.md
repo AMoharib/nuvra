@@ -2,7 +2,7 @@
 
 Speak Arabic and English. Paste clear English text into the app where you are working.
 
-Nuvra is an open-source Windows dictation app. Start recording with a keyboard shortcut, speak naturally, and finish to paste the result into your active text field.
+Nuvra is an open-source dictation app for Windows, with experimental macOS builds. Start recording with a keyboard shortcut, speak naturally, and finish to paste the result into your active text field.
 
 [Website](https://mahmoud6901.github.io/nuvra/) · [Download for Windows](https://github.com/Mahmoud6901/nuvra/releases/latest) · [Report a problem](https://github.com/Mahmoud6901/nuvra/issues/new?template=bug_report.yml)
 
@@ -15,6 +15,20 @@ Nuvra is an open-source Windows dictation app. Start recording with a keyboard s
 5. Keep Nuvra running, click in the destination text field, and press **Ctrl + Alt + Space**. Speak, then press the shortcut again to finish and paste.
 
 Nuvra requires Windows 10 or 11, 64-bit, and Microsoft Edge WebView2. The installer installs WebView2 if needed. Local speech models require a one-time download and several gigabytes of free disk space. An NVIDIA GPU is optional. CPU processing is supported.
+
+### macOS (experimental)
+
+macOS 15 or newer is required. Download `Nuvra-<version>-macos-arm64.dmg` for Apple Silicon or `Nuvra-<version>-macos-x86_64.dmg` for Intel from the release assets. Open the DMG and drag **Nuvra** into **Applications**. ZIP archives of the same app are also available. Verify downloads against the matching `SHA256SUMS-macos-<architecture>.txt` file.
+
+These builds have an ad-hoc signature, not an Apple Developer ID signature or notarization. macOS may block the first launch. After attempting to open the app, use **System Settings → Privacy & Security → Open Anyway** if you trust the download. This does not require disabling Gatekeeper.
+
+Allow microphone access when prompted. For global shortcuts and automatic paste, enable **Nuvra** under **System Settings → Privacy & Security → Accessibility**, then quit and reopen it. If the shortcut status also requests **Input Monitoring**, enable that permission and restart. The default shortcut is **Control + Option + Space**. Plain **Return** finishes recording and **Escape** cancels while the recording pill is open.
+
+Local Whisper runs on the CPU on macOS; Metal and CUDA acceleration are not included. Automatic paste requires the destination app to expose its focused text field through Accessibility. If it cannot verify that field, Nuvra preserves the text for manual copying. macOS updates are notification-only: download the new DMG, quit Nuvra, and replace the app in Applications.
+
+macOS stores settings and history in `~/Library/Application Support/Nuvra`. The `ARABIC_RELAY_DATA_DIR` override also works on macOS. Codex and Claude Code are discovered on `PATH`, in `~/.local/bin`, and in the usual Homebrew directories. Wispr Flow is detected in `/Applications` or `~/Applications`.
+
+Saved service credentials are encrypted with a key stored in your macOS login Keychain. If the Keychain is locked or access is denied, Nuvra reports an error instead of saving plaintext credentials.
 
 ## Writing modes
 
@@ -86,6 +100,16 @@ For the NVIDIA GPU dependency, install the optional extra with `.\.venv\Scripts\
 
 The Python package remains `arabic_relay`. Both `nuvra` and `arabic-relay` are available as installed launch commands.
 
+On macOS, use Python 3.13 from python.org or Homebrew:
+
+```sh
+python3.13 -m venv .venv
+.venv/bin/python -m pip install -e '.[build]'
+.venv/bin/python -m arabic_relay
+```
+
+Development runs need microphone and Accessibility permissions for the Python host. The packaged app has its own permission identity.
+
 ### Tests
 
 Install Node.js to run the interface tests. Prepare the small speech model used by the Python tests, then run the suites from the repository root.
@@ -114,6 +138,22 @@ Install Inno Setup 6, then run the build from the repository root.
 ```
 
 The build creates `dist\Nuvra\Nuvra.exe` and `dist\ArabicRelay-Setup-<version>.exe` and runs the packaged app's self-test.
+
+### Build macOS release assets
+
+Run on the target architecture Mac with Python 3.13 and Apple's command-line tools:
+
+```sh
+.venv/bin/python -m unittest discover -s tests -p 'test_macos.py' -v
+.venv/bin/python -m unittest discover -s tests -p 'test_paste.py' -v
+.venv/bin/python scripts/build_macos.py
+```
+
+The script creates `dist/Nuvra.app`, a DMG with an Applications shortcut, a ZIP, and SHA-256 checksums. It generates the macOS icon from the existing PNG, verifies the bundle's ad-hoc signature, and runs `--self-test` using a temporary data directory. That test checks the HTTP server and imports the packaged speech engine. A second `--self-test-gui` briefly opens a native window and checks that WebKit exposes the recording APIs. Neither test records audio or sends keys to another app. Build in a logged-in graphical macOS session.
+
+The macOS workflow builds both architectures on pull requests and manual runs. Tagged releases wait for these builds and attach their assets to the existing draft release. The maintainer's offline Windows signing/publishing step remains unchanged. Apple Developer ID signing and notarization require a separate maintainer setup.
+
+Before publishing a macOS build, test microphone permission, dictation, Return/Escape, clipboard restoration, and pasting into a real text field on each architecture. Automated tests mock global input and use a separate test clipboard.
 
 ## Report a problem
 

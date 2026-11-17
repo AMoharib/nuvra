@@ -137,6 +137,10 @@ class Blob(ctypes.Structure):
 
 
 def protect(data, decrypt=False):
+    import sys
+    if sys.platform == 'darwin':
+        from .macos_credentials import protect as mac_protect
+        return mac_protect(data, decrypt)
     if os.name != 'nt':
         raise ValueError('This version stores its T3 credentials using Windows encryption.')
     buffer = ctypes.create_string_buffer(data)
