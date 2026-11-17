@@ -26,7 +26,7 @@ class ArabicPage(HTMLParser):
             name, quote, value = match.groups()
             if name in ('alt', 'title', 'aria-label', 'content'):
                 value = COPY.get(value, value)
-            if name in ('src', 'href') and (value.startswith('assets/') or value in ('main.js', 'downloads.js', 'scenes.js', 'styles.css')):
+            if name in ('src', 'href') and (value.startswith('assets/') or value in ('platform.js', 'main.js', 'downloads.js', 'scenes.js', 'styles.css')):
                 value = '../' + value
             if name == 'srcset':
                 value = value.replace('assets/', '../assets/')

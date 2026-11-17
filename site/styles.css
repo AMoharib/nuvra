@@ -466,6 +466,10 @@ section { padding-inline: var(--margin); }
 /* Decorative platform marks inherit the button colour in each section. */
 .button .download-icon { width: 1.1em; height: 1.1em; flex: 0 0 auto; }
 .download-status { margin-top: 1rem; font-size: var(--step-body); max-width: 65ch; }
+.other-downloads { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid currentColor; }
+.other-downloads summary { cursor: pointer; font-size: var(--step-body); }
+.other-downloads .close-row { margin-top: 1.5rem; }
+.other-downloads[hidden] { display: none; }
 
 .language-switch { display: inline-flex; align-items: center; min-height: 44px; white-space: nowrap; }
 html[dir="rtl"] .wordmark, html[dir="rtl"] .window-bar, html[dir="rtl"] .demo-keys { direction: ltr; }
@@ -493,3 +497,13 @@ kbd { direction: ltr; unicode-bidi: isolate; }
 }
 .kept-after { grid-template-columns: minmax(0, 1fr); min-width: 0; }
 .button[data-platform-download] { max-width: 100%; white-space: normal; padding-block: 0.75rem; }
+
+/* The Mac key names are longer; keep all four readable on narrow phones. */
+@media (max-width: 640px) {
+  .demo-keys { gap: 6px; }
+  .demo-keys kbd { padding-inline: 8px; font-size: 14px; }
+}
+html[lang="ar"] .how.is-live[data-beat="0"] .how-count::after { content: "الخطوة 1 من 4"; }
+html[lang="ar"] .how.is-live[data-beat="1"] .how-count::after { content: "الخطوة 2 من 4"; }
+html[lang="ar"] .how.is-live[data-beat="2"] .how-count::after { content: "الخطوة 3 من 4"; }
+html[lang="ar"] .how.is-live[data-beat="3"] .how-count::after { content: "الخطوة 4 من 4"; }

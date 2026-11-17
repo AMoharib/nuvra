@@ -22,6 +22,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Zain:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/scenes/stage.css">
 <link rel="stylesheet" href="styles.css">
+<script src="platform.js" defer></script>
 <script src="main.js" defer></script>
 <script src="downloads.js" defer></script>
 </head>
@@ -50,7 +51,7 @@
     </h1>
     <p class="hero-sub" data-load style="--d:420ms">A free dictation app: use one shortcut, talk in Arabic and English, and clear English is pasted where you were typing.</p>
     <a class="button hero-action" data-load style="--d:500ms" data-platform-download href="#download"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#download"/></svg><span data-download-label>Choose your download</span></a>
-    <p class="platform-note">Windows 10/11 · <a href="#macos-download">macOS 15+ preview</a></p>
+    <p class="platform-note" data-platform-copy="platformNote">Windows 10/11 · <a href="#macos-download">macOS 15+ preview</a></p>
   </div>
 
   <figure class="hero-window" data-open>
@@ -113,21 +114,21 @@
     <div class="how-copy">
       <h2 class="how-title" id="how-title">One shortcut, start to finish</h2>
       <ol class="steps">
-        <li class="step" data-step="0"><h3>A keypress</h3><p>Press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Space</kbd> in the field you are typing in. On Mac, use <kbd>Control</kbd> + <kbd>Option</kbd> + <kbd>Space</kbd>.</p></li>
+        <li class="step" data-step="0"><h3>A keypress</h3><p data-platform-copy="start">Press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Space</kbd> in the field you are typing in. On Mac, use <kbd>Control</kbd> + <kbd>Option</kbd> + <kbd>Space</kbd>.</p></li>
         <li class="step" data-step="1"><h3>As long as you talk</h3><p>Talk in Arabic, English or both. Nuvra transcribes while you speak, and <kbd>Esc</kbd> cancels.</p></li>
-        <li class="step" data-step="2"><h3>A moment</h3><p>Press <kbd>Enter</kbd> on Windows or <kbd>Return</kbd> on Mac to finish. Clear English is pasted at your cursor.</p></li>
-        <li class="step" data-step="3"><h3>When you are ready</h3><p>Read it and send it yourself. Nuvra never presses Enter in your app.</p></li>
+        <li class="step" data-step="2"><h3>A moment</h3><p data-platform-copy="finish">Press <kbd>Enter</kbd> on Windows or <kbd>Return</kbd> on Mac to finish. Clear English is pasted at your cursor.</p></li>
+        <li class="step" data-step="3"><h3>When you are ready</h3><p data-platform-copy="send">Read it and send it yourself. Nuvra never presses Enter in your app.</p></li>
       </ol>
       <p class="how-count" aria-hidden="true"></p>
     </div>
     <div class="demo" data-ui aria-hidden="true">
-      <div class="demo-keys"><kbd class="k-ctrl">Ctrl</kbd><kbd class="k-alt">Alt</kbd><kbd class="k-space">Space</kbd><kbd class="k-enter">Enter</kbd></div>
+      <div class="demo-keys"><kbd class="k-ctrl" data-platform-key="control">Ctrl</kbd><kbd class="k-alt" data-platform-key="alt">Alt</kbd><kbd class="k-space">Space</kbd><kbd class="k-enter" data-platform-key="finish">Enter</kbd></div>
       <p class="demo-said" lang="ar" dir="rtl"><span>راجع</span> <span>صفحة</span> <span>الـ login</span> <span>وحسّن</span> <span>الـ error messages</span></p>
       <div class="pill demo-pill"><span class="pill-btn"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></svg></span><span class="pill-dots demo-dots"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i></span><span class="pill-btn go"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8"/></svg></span></div>
       <div class="demo-field">
         <p class="demo-app">Team chat</p>
         <p class="demo-text"><span class="demo-placeholder">Write a message</span><span class="demo-out" lang="en" dir="ltr">Review the login page and improve the error messages.</span><span class="demo-caret"></span></p>
-        <p class="demo-send">Enter sends. Nuvra never presses it.</p>
+        <p class="demo-send" data-platform-copy="demoSend">Enter sends. Nuvra never presses it.</p>
       </div>
     </div>
   </div>
@@ -190,8 +191,8 @@
   <h2 class="faq-title rise" id="faq-title" data-reveal><span class="line"><span>Questions before you install</span></span></h2>
   <div class="faq-list">
     <details data-reveal style="--i:1">
-      <summary>Does Nuvra press Enter or send anything for me?</summary>
-      <div class="faq-answer"><p>No. It pastes the text where your cursor was and stops there. Sending stays your action in your app. During a recording, Enter only finishes the recording.</p></div>
+      <summary data-platform-copy="faqTitle">Does Nuvra press Enter or send anything for me?</summary>
+      <div class="faq-answer"><p data-platform-copy="faqAnswer">No. It pastes the text where your cursor was and stops there. Sending stays your action in your app. During a recording, Enter only finishes the recording.</p></div>
     </details>
     <details data-reveal style="--i:2">
       <summary>Do I need an NVIDIA graphics card?</summary>
@@ -217,20 +218,16 @@
       <summary>Can I use the app in Arabic?</summary>
       <div class="faq-answer"><p>Yes. Settings, then Language, switches the window and the pill to Egyptian Arabic, right to left. Your prompts stay in English.</p></div>
     </details>
-    <details data-reveal style="--i:7">
-      <summary>Why is the installer called ArabicRelay-Setup?</summary>
-      <div class="faq-answer"><p>Nuvra used to be called Arabic Relay. The installer keeps the old name so existing installations update cleanly, with their settings, history and models where they were.</p></div>
-    </details>
   </div>
 </section>
 
 <section class="close" id="download" aria-labelledby="close-title">
   <h2 class="close-title rise" id="close-title" data-reveal><span class="line"><span>Talk the way</span></span><span class="line"><span>you think</span></span></h2>
   <div class="close-row" data-reveal style="--i:1">
-    <p>For Windows 10 and 11, 64-bit. The installer adds Microsoft WebView2 if you need it. Free and open source.</p>
-    <a class="button button-large" id="windows-download" href="https://github.com/Mahmoud6901/nuvra/releases/latest"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#windows"/></svg><span data-download-label>Windows releases</span></a>
+    <p data-platform-copy="downloadIntro">Choose Windows or macOS below. Free and open source.</p>
+    <a class="button button-large" data-platform-download href="https://github.com/Mahmoud6901/nuvra/releases/latest"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#download"/></svg><span data-download-label>Choose your download</span></a>
   </div>
-  <p class="download-status" id="download-status" role="status">Choose Windows or macOS. If download links are unavailable, open the release page.</p>
+  <p class="download-status" id="primary-download-status" role="status"></p>
   <div class="mac-download" id="macos-download">
     <div class="mac-download-copy">
       <h3>macOS preview</h3>
@@ -243,9 +240,17 @@
         <a class="button" data-macos-arch="arm64" hidden><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#apple"/></svg><span data-download-label>Download for Apple Silicon</span></a>
         <a class="button" data-macos-arch="x86_64" hidden><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#apple"/></svg><span data-download-label>Download for Intel Mac</span></a>
       </div>
-      <p class="mac-release-links"><a href="https://github.com/Mahmoud6901/nuvra/releases">All releases</a> · <a href="https://github.com/Mahmoud6901/nuvra/actions/workflows/macos.yml">Preview builds</a></p>
+      <p class="mac-release-links"><a href="https://github.com/Mahmoud6901/nuvra/releases">All releases</a> · <a href="https://github.com/Mahmoud6901/nuvra/actions/workflows/macos.yml?query=branch%3Amain+is%3Asuccess">Preview builds (GitHub sign-in)</a></p>
     </div>
   </div>
+  <details class="other-downloads" id="other-platform-downloads" open>
+    <summary>Other platforms · Windows</summary>
+    <div class="close-row">
+      <p>For Windows 10 and 11, 64-bit. The installer adds Microsoft WebView2 if you need it. Free and open source.</p>
+      <a class="button button-large" id="windows-download" href="https://github.com/Mahmoud6901/nuvra/releases/latest"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#windows"/></svg><span data-download-label>Windows releases</span></a>
+    </div>
+    <p class="download-status" id="download-status" role="status">Choose Windows or macOS. If download links are unavailable, open the release page.</p>
+  </details>
 </section>
 
 </main>

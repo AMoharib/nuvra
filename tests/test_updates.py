@@ -6,6 +6,7 @@ from pathlib import Path
 import tempfile
 import threading
 import time
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -37,6 +38,8 @@ class Updates(unittest.TestCase):
         self.release = self.make_release('v0.2.0')
         self.requests = []
         for patcher in (patch.object(paths, 'DATA', self.data), patch.object(updates, '__version__', '0.1.0'),
+                        # This suite exercises Windows installs; test_macos covers notify-only updates.
+                        patch.object(updates, 'sys', SimpleNamespace(platform='win32')),
                         patch.object(updates, 'PUBLIC_KEY', public_hex(self.key)),
                         patch.object(updates.urllib.request, 'urlopen', side_effect=self.urlopen),
                         patch.object(models, 'fetch', side_effect=self.fetch),
@@ -46,8 +49,8 @@ class Updates(unittest.TestCase):
         updates.STATE.update(available=None, releaseUrl=None, failed=None)
         self.addCleanup(updates.STATE.update, available=None, releaseUrl=None, failed=None)
 
-    def make_release(self, tag, signed=True):
-        name = f'ArabicRelay-Setup-{tag[1:]}.exe'
+    def make_release(self, tag, signed=True, prefix='ArabicRelay'):
+        name = f'{prefix}-Setup-{tag[1:]}.exe'
         assets = [{'name': name, 'size': len(SETUP), 'browser_download_url': 'https://example.test/' + name},
                   {'name': 'SHA256SUMS.txt', 'size': 100, 'browser_download_url': 'https://example.test/SHA256SUMS.txt'}]
         if signed:
@@ -60,7 +63,8 @@ class Updates(unittest.TestCase):
         if url == updates.API:
             return Reply(json.dumps(self.release).encode())
         if url.endswith('SHA256SUMS.txt'):
-            return Reply(f'{hashlib.sha256(SETUP).hexdigest()}  ArabicRelay-Setup-0.2.0.exe\n'.encode())
+            return Reply(''.join(f'{hashlib.sha256(SETUP).hexdigest()}  {a["name"]}\n'
+                                 for a in self.release['assets'] if a['name'].endswith('.exe')).encode())
         if url.endswith('.sig'):
             return Reply(self.signature)
         raise AssertionError(url)
@@ -95,6 +99,28 @@ class Updates(unittest.TestCase):
         self.assertEqual(state['releaseUrl'], self.release['html_url'])
         self.assertTrue((self.folder() / 'ready.json').is_file())
         self.assertTrue(all(r.get_header('User-agent', '').startswith('Arabic-Relay/') for r in self.requests))
+
+    def test_new_installer_name_is_downloaded_and_installed(self):
+        self.release = self.make_release('v0.2.0', prefix='Nuvra')
+        self.assertEqual(updates.check()['ready'], '0.2.0')
+        self.assertEqual(updates.ready()['file'], 'Nuvra-Setup-0.2.0.exe')
+        with patch.object(updates.subprocess, 'Popen') as popen:
+            updates.install(True)
+        self.assertEqual(Path(popen.call_args.args[0][0]).name, 'Nuvra-Setup-0.2.0.exe')
+
+    def test_new_name_is_preferred_and_old_cached_installer_removed(self):
+        updates.check()  # Download a legacy release first.
+        self.release['assets'] += self.make_release('v0.2.0', prefix='Nuvra')['assets']
+        updates.download(self.release, '0.2.0')
+        self.assertEqual(updates.ready()['file'], 'Nuvra-Setup-0.2.0.exe')
+        self.assertFalse((self.folder() / 'ArabicRelay-Setup-0.2.0.exe').exists())
+
+    def test_new_installer_cannot_borrow_legacy_signature(self):
+        self.release['assets'] += self.make_release('v0.2.0', signed=False, prefix='Nuvra')['assets']
+        with self.assertLogs(level='WARNING'):
+            updates.check()
+        self.assertIsNone(updates.ready())
+        self.assertEqual(list(self.folder().glob('*')), [])
 
     def test_tampered_or_unsigned_update_is_deleted(self):
         for release, signature in ((self.release, self.key.sign(b'something else')), (self.make_release('v0.2.0', signed=False), self.signature)):

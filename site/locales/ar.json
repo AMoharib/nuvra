@@ -96,8 +96,6 @@
   "if the first launch is blocked. Updates are manual: quit Nuvra and replace it with the new app.": "لو أول تشغيل اتمنع. التحديث يدوي: اقفل Nuvra واستبدله بالنسخة الجديدة.",
   "Can I use the app in Arabic?": "ينفع أستخدم التطبيق بالعربي؟",
   "Yes. Settings, then Language, switches the window and the pill to Egyptian Arabic, right to left. Your prompts stay in English.": "أيوه. من الإعدادات، اختار اللغة عشان تحوّل النافذة وشريط التسجيل للعربي المصري، من اليمين للشمال. البرومبتات بتفضل بالإنجليزي.",
-  "Why is the installer called ArabicRelay-Setup?": "ليه اسم ملف التثبيت ArabicRelay-Setup؟",
-  "Nuvra used to be called Arabic Relay. The installer keeps the old name so existing installations update cleanly, with their settings, history and models where they were.": "Nuvra كان اسمه Arabic Relay. ملف التثبيت محتفظ بالاسم القديم عشان النسخ الموجودة تتحدّث من غير ما تفقد الإعدادات أو السجل أو النماذج.",
   "Talk the way": "اتكلم زي",
   "you think": "ما بتفكّر",
   "For Windows 10 and 11, 64-bit. The installer adds Microsoft WebView2 if you need it. Free and open source.": "لويندوز 10 و11 بنظام 64 بت. ملف التثبيت بيضيف Microsoft WebView2 لو محتاجه. مجاني ومفتوح المصدر.",
@@ -110,12 +108,14 @@
   "Download for Apple Silicon": "تحميل لـ Apple Silicon",
   "Download for Intel Mac": "تحميل لماك Intel",
   "All releases": "كل الإصدارات",
-  "Preview builds": "النسخ التجريبية",
   "Open-source dictation for people who think in Arabic and work in English. Windows, with a macOS preview. MIT licence.": "إملاء مفتوح المصدر للي بيفكّر بالعربي وبيشتغل بالإنجليزي. لويندوز، مع نسخة تجريبية للماك. بترخيص MIT.",
   "Back to top": "ارجع لفوق",
   "Open an issue on GitHub": "بلّغ عن مشكلة على GitHub",
   "Project links": "روابط المشروع",
   "Downloads": "التحميلات",
   "Source code": "الكود المصدري",
-  "Product names and logos are trademarks of their owners.": "أسماء المنتجات وشعاراتها علامات تجارية لأصحابها."
+  "Product names and logos are trademarks of their owners.": "أسماء المنتجات وشعاراتها علامات تجارية لأصحابها.",
+  "Choose Windows or macOS below. Free and open source.": "اختار ويندوز أو macOS من تحت. مجاني ومفتوح المصدر.",
+  "Preview builds (GitHub sign-in)": "النسخ التجريبية (بتحتاج دخول GitHub)",
+  "Other platforms · Windows": "أنظمة تانية · ويندوز"
 }

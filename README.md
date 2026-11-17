@@ -8,7 +8,7 @@ Nuvra is an open-source dictation app for Windows, with experimental macOS build
 
 ## Install and get started
 
-1. Download `ArabicRelay-Setup-<version>.exe` from the latest release and run it. Installation is per user. The installer filename retains the original project name for compatibility with existing updates.
+1. Download the Windows installer from the [website](https://mahmoud6901.github.io/nuvra/#download) and run it. New builds are named `Nuvra-Setup-<version>.exe`. Installation is per user.
 2. Open Nuvra and choose a speech model in **Models**. Local Whisper models download from this tab. Cohere and Wispr Flow are also available.
 3. Install and sign in to Codex CLI or Claude Code, then select your preferred model in **Models** for English prompt preparation and translation fallback.
 4. Choose **Translate Arabic only** or **Structured prompt** in **Settings**.
@@ -137,7 +137,9 @@ Install Inno Setup 6, then run the build from the repository root.
 .\scripts\build.ps1
 ```
 
-The build creates `dist\Nuvra\Nuvra.exe` and `dist\ArabicRelay-Setup-<version>.exe` and runs the packaged app's self-test.
+The build creates `dist\Nuvra\Nuvra.exe` and `dist\Nuvra-Setup-<version>.exe` and runs the packaged app's self-test.
+
+The release workflow also publishes an identical `ArabicRelay-Setup-<version>.exe` alias for older automatic updaters, with checksums and signatures for both filenames. New clients and the website prefer `Nuvra-Setup`; they also accept the older filename in existing releases. The installer keeps its original application ID and data locations so upgrades preserve settings, history and models. Run `python scripts/sign_release.py <tag>` to sign all installer aliases and publish the draft; mismatched aliases are rejected.
 
 ### Build macOS release assets
 

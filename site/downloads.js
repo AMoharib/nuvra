@@ -5,9 +5,11 @@
   const assetPrefix = document.documentElement.dataset.assetPrefix || '';
   const repo = 'Mahmoud6901/nuvra';
   const releases = `https://github.com/${repo}/releases/latest`;
+  const previews = `https://github.com/${repo}/actions/workflows/macos.yml?query=branch%3Amain+is%3Asuccess`;
   const primary = [...document.querySelectorAll('[data-platform-download]')];
   const windows = document.getElementById('windows-download');
   const status = document.getElementById('download-status');
+  const primaryStatus = document.getElementById('primary-download-status');
   const macStatus = document.getElementById('mac-release-status');
   const macLinks = document.getElementById('mac-download-links');
   if (!windows || !status || !macStatus || !macLinks) return;
@@ -19,13 +21,7 @@
     link.setAttribute('aria-label', description);
     link.title = description;
   }
-  const ua = navigator.userAgent || '';
-  const platform = navigator.userAgentData?.platform || navigator.platform || '';
-  // iPadOS can report MacIntel; never offer it a desktop installer automatically.
-  const mobile = navigator.userAgentData?.mobile || /Android|iPhone|iPad|iPod|Windows Phone/i.test(ua)
-    || (/Mac/i.test(platform) && navigator.maxTouchPoints > 1);
-  const os = mobile ? 'other' : /Win/i.test(platform) || /Windows NT/i.test(ua) ? 'windows'
-    : /Mac/i.test(platform) || /Macintosh/i.test(ua) ? 'mac' : 'other';
+  const os = window.nuvraPlatform?.os || 'other';
   const icon = os === 'mac' ? 'apple' : os === 'windows' ? 'windows' : 'download';
   const fallback = os === 'mac' ? '#macos-download' : '#download';
   for (const link of primary) update(link, fallback, os === 'mac' ? t('Choose your Mac download', 'اختار نسخة الماك') : t('Choose your download', 'اختار نسخة جهازك'), icon);
@@ -65,7 +61,7 @@
       const expected = `https://github.com/${repo}/releases/download/${release.tag_name}/${name}`;
       return release.assets.some(asset => asset?.name === name && asset.browser_download_url === expected) ? expected : null;
     }
-    const exe = assetURL(`ArabicRelay-Setup-${version}.exe`);
+    const exe = assetURL(`Nuvra-Setup-${version}.exe`) || assetURL(`ArabicRelay-Setup-${version}.exe`);
     if (exe) update(windows, exe, t('Download for Windows', 'تحميل لويندوز'), 'windows', t(`Download Nuvra ${version} for Windows (.exe)`, `تحميل Nuvra ${version} لويندوز (.exe)`));
     status.textContent = exe ? t(`Nuvra ${version} · Windows 10/11, 64-bit. The download starts when you click.`, `Nuvra ${version} · ويندوز 10 و11، 64 بت. التحميل بيبدأ لما تدوس.`)
       : t('The latest release has no Windows installer. Check all releases for earlier versions.', 'آخر إصدار مفيهوش ملف تثبيت لويندوز. شوف كل الإصدارات للنسخ الأقدم.');
@@ -84,18 +80,24 @@
     macLinks.hidden = !available;
     macStatus.textContent = available
       ? t(`Nuvra ${version} · macOS preview${available === 1 ? ' · one architecture available' : ''}. Find your chip in Apple menu → About This Mac.`, `Nuvra ${version} · نسخة الماك التجريبية${available === 1 ? ' · متاحة لنوع معالج واحد' : ''}. اعرف نوع معالجك من قائمة Apple ← حول هذا الـ Mac.`)
-      : t('macOS preview builds are not available in the latest release.', 'نسخ الماك التجريبية مش متاحة في آخر إصدار.');
+      : t('Mac downloads are currently shared as preview builds on GitHub. Sign in, open a successful build, and download macos-arm64 for Apple Silicon or macos-x86_64 for Intel.', 'تحميلات الماك متاحة حاليًا كنسخ تجريبية على GitHub. سجّل دخولك، افتح عملية بناء ناجحة، وحمّل macos-arm64 لـ Apple Silicon أو macos-x86_64 لـ Intel.');
+    if (primaryStatus) primaryStatus.textContent = os === 'windows' ? status.textContent
+      : os === 'mac' && !available ? t('Get the macOS preview on GitHub. Sign-in required.', 'حمّل نسخة الماك التجريبية من GitHub. تسجيل الدخول مطلوب.') : '';
     for (const link of primary) {
       if (os === 'windows' && exe) update(link, exe, t('Download for Windows', 'تحميل لويندوز'), icon, t(`Download Nuvra ${version} for Windows (.exe)`, `تحميل Nuvra ${version} لويندوز (.exe)`));
+      else if (os === 'windows') update(link, releases, t('Windows releases', 'إصدارات ويندوز'), icon);
       else if (os === 'mac' && arch && mac[arch]) {
         const chip = arch === 'arm64' ? 'Apple Silicon' : 'Intel';
         update(link, mac[arch], t('Download for Mac', 'تحميل للماك'), icon, t(`Download Nuvra ${version} for Mac (${chip}, .dmg)`, `تحميل Nuvra ${version} للماك (${chip}، .dmg)`));
-      } else if (os === 'mac' && !available) update(link, fallback, t('macOS preview availability', 'شوف نسخ الماك التجريبية'), icon);
+      } else if (os === 'mac' && !available) update(link, previews, t('Get Mac preview builds', 'تحميل نسخ الماك التجريبية'), icon,
+        t('Get Mac preview builds on GitHub (sign-in required)', 'تحميل نسخ الماك التجريبية من GitHub (تسجيل الدخول مطلوب)'));
     }
   } catch {
     status.textContent = t('Could not load the latest installers. Use the release links to download manually.', 'ما قدرناش نحمّل روابط آخر إصدار. استخدم روابط الإصدارات للتحميل اليدوي.');
     macStatus.textContent = t('Could not check macOS downloads. See all releases, or try again later.', 'ما قدرناش نتحقق من تحميلات الماك. شوف كل الإصدارات أو جرّب تاني بعدين.');
+    if (primaryStatus) primaryStatus.textContent = os === 'windows' ? status.textContent : os === 'mac' ? macStatus.textContent : '';
     update(windows, releases, t('Windows releases', 'إصدارات ويندوز'), 'windows');
-    // Keep primary links on the local chooser; do not guess an installer URL.
+    if (os === 'windows') for (const link of primary) update(link, releases, t('Windows releases', 'إصدارات ويندوز'), icon);
+    // Mac and unsupported visitors retain the local chooser; never guess an installer URL.
   }
 })();

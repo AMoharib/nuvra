@@ -1,5 +1,5 @@
 # Builds dist\Nuvra\ with PyInstaller, checks it with the frozen --self-test, then builds
-# dist\ArabicRelay-Setup-<version>.exe with Inno Setup. Used locally and by .github/workflows/release.yml.
+# dist\Nuvra-Setup-<version>.exe with Inno Setup. Used locally and by .github/workflows/release.yml.
 #   -Smoke   silent install into a temp folder, installed --self-test, silent uninstall (reuses an existing setup).
 #            Only where Nuvra isn't installed (CI): the smoke uninstall shares the real install's AppId.
 param([switch]$Smoke)
@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path $PSScriptRoot -Parent)
 $python = if (Test-Path .venv\Scripts\python.exe) { '.venv\Scripts\python.exe' } else { 'python' }
 $version = & $python -c "import arabic_relay; print(arabic_relay.__version__)"
-$setup = "dist\ArabicRelay-Setup-$version.exe"
+$setup = "dist\Nuvra-Setup-$version.exe"
 
 function Invoke-SelfTest([string]$exe) {
     $data = Join-Path $env:TEMP "relay-selftest-$(Get-Random)"

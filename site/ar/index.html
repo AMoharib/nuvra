@@ -22,6 +22,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Zain:wght@300;400;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/scenes/stage.css">
 <link rel="stylesheet" href="../styles.css">
+<script src="../platform.js" defer></script>
 <script src="../main.js" defer></script>
 <script src="../downloads.js" defer></script>
 </head>
@@ -50,7 +51,7 @@
     </h1>
     <p class="hero-sub" data-load style="--d:420ms">تطبيق إملاء مجاني: دوس اختصار واحد، اتكلم بالعربي والإنجليزي، ونص إنجليزي واضح يتلصق مكان ما بتكتب.</p>
     <a class="button hero-action" data-load style="--d:500ms" data-platform-download href="#download"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="../assets/icons/platforms.svg#download"/></svg><span data-download-label>اختار نسخة جهازك</span></a>
-    <p class="platform-note">ويندوز 10 و11 · <a href="#macos-download">نسخة تجريبية لـ macOS 15 أو أحدث</a></p>
+    <p class="platform-note" data-platform-copy="platformNote">ويندوز 10 و11 · <a href="#macos-download">نسخة تجريبية لـ macOS 15 أو أحدث</a></p>
   </div>
 
   <figure class="hero-window" data-open>
@@ -113,21 +114,21 @@
     <div class="how-copy">
       <h2 class="how-title" id="how-title">اختصار واحد من البداية للنهاية</h2>
       <ol class="steps">
-        <li class="step" data-step="0"><h3>دوس الاختصار</h3><p>دوس <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Space</kbd> في المكان اللي بتكتب فيه. على الماك، استخدم <kbd>Control</kbd> + <kbd>Option</kbd> + <kbd>Space</kbd>.</p></li>
+        <li class="step" data-step="0"><h3>دوس الاختصار</h3><p data-platform-copy="start">دوس <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Space</kbd> في المكان اللي بتكتب فيه. على الماك، استخدم <kbd>Control</kbd> + <kbd>Option</kbd> + <kbd>Space</kbd>.</p></li>
         <li class="step" data-step="1"><h3>اتكلم براحتك</h3><p>اتكلم بالعربي أو الإنجليزي أو الاتنين. Nuvra بيحوّل كلامك لنص، وزرار <kbd>Esc</kbd> بيلغي التسجيل.</p></li>
-        <li class="step" data-step="2"><h3>استنى لحظة</h3><p>دوس <kbd>Enter</kbd> على ويندوز، أو <kbd>Return</kbd> على الماك عشان تخلّص. نص إنجليزي واضح بيتلصق مكان المؤشر.</p></li>
-        <li class="step" data-step="3"><h3>ابعت لما تجهز</h3><p>راجع النص وابعت بنفسك. Nuvra مش بيدوس Enter في التطبيق بتاعك.</p></li>
+        <li class="step" data-step="2"><h3>استنى لحظة</h3><p data-platform-copy="finish">دوس <kbd>Enter</kbd> على ويندوز، أو <kbd>Return</kbd> على الماك عشان تخلّص. نص إنجليزي واضح بيتلصق مكان المؤشر.</p></li>
+        <li class="step" data-step="3"><h3>ابعت لما تجهز</h3><p data-platform-copy="send">راجع النص وابعت بنفسك. Nuvra مش بيدوس Enter في التطبيق بتاعك.</p></li>
       </ol>
       <p class="how-count" aria-hidden="true"></p>
     </div>
     <div class="demo" data-ui aria-hidden="true">
-      <div class="demo-keys"><kbd class="k-ctrl">Ctrl</kbd><kbd class="k-alt">Alt</kbd><kbd class="k-space">Space</kbd><kbd class="k-enter">Enter</kbd></div>
+      <div class="demo-keys"><kbd class="k-ctrl" data-platform-key="control">Ctrl</kbd><kbd class="k-alt" data-platform-key="alt">Alt</kbd><kbd class="k-space">Space</kbd><kbd class="k-enter" data-platform-key="finish">Enter</kbd></div>
       <p class="demo-said" lang="ar" dir="rtl"><span>راجع</span> <span>صفحة</span> <span>الـ login</span> <span>وحسّن</span> <span>الـ error messages</span></p>
       <div class="pill demo-pill"><span class="pill-btn"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></svg></span><span class="pill-dots demo-dots"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i></span><span class="pill-btn go"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8"/></svg></span></div>
       <div class="demo-field">
         <p class="demo-app">محادثة الفريق</p>
         <p class="demo-text"><span class="demo-placeholder">اكتب رسالة</span><span class="demo-out" lang="en" dir="ltr">Review the login page and improve the error messages.</span><span class="demo-caret"></span></p>
-        <p class="demo-send">Enter بيبعت الرسالة. Nuvra مش بيدوسه.</p>
+        <p class="demo-send" data-platform-copy="demoSend">Enter بيبعت الرسالة. Nuvra مش بيدوسه.</p>
       </div>
     </div>
   </div>
@@ -190,8 +191,8 @@
   <h2 class="faq-title rise" id="faq-title" data-reveal><span class="line"><span>أسئلة قبل التثبيت</span></span></h2>
   <div class="faq-list">
     <details data-reveal style="--i:1">
-      <summary>هل Nuvra بيدوس Enter أو بيبعت حاجة بدالي؟</summary>
-      <div class="faq-answer"><p>لأ. بيلصق النص مكان المؤشر وبس. إنت اللي بتبعت من التطبيق بتاعك. أثناء التسجيل، Enter بيخلّص التسجيل بس.</p></div>
+      <summary data-platform-copy="faqTitle">هل Nuvra بيدوس Enter أو بيبعت حاجة بدالي؟</summary>
+      <div class="faq-answer"><p data-platform-copy="faqAnswer">لأ. بيلصق النص مكان المؤشر وبس. إنت اللي بتبعت من التطبيق بتاعك. أثناء التسجيل، Enter بيخلّص التسجيل بس.</p></div>
     </details>
     <details data-reveal style="--i:2">
       <summary>هل محتاج كارت شاشة NVIDIA؟</summary>
@@ -217,20 +218,16 @@
       <summary>ينفع أستخدم التطبيق بالعربي؟</summary>
       <div class="faq-answer"><p>أيوه. من الإعدادات، اختار اللغة عشان تحوّل النافذة وشريط التسجيل للعربي المصري، من اليمين للشمال. البرومبتات بتفضل بالإنجليزي.</p></div>
     </details>
-    <details data-reveal style="--i:7">
-      <summary>ليه اسم ملف التثبيت ArabicRelay-Setup؟</summary>
-      <div class="faq-answer"><p>Nuvra كان اسمه Arabic Relay. ملف التثبيت محتفظ بالاسم القديم عشان النسخ الموجودة تتحدّث من غير ما تفقد الإعدادات أو السجل أو النماذج.</p></div>
-    </details>
   </div>
 </section>
 
 <section class="close" id="download" aria-labelledby="close-title">
   <h2 class="close-title rise" id="close-title" data-reveal><span class="line"><span>اتكلم زي</span></span><span class="line"><span>ما بتفكّر</span></span></h2>
   <div class="close-row" data-reveal style="--i:1">
-    <p>لويندوز 10 و11 بنظام 64 بت. ملف التثبيت بيضيف Microsoft WebView2 لو محتاجه. مجاني ومفتوح المصدر.</p>
-    <a class="button button-large" id="windows-download" href="https://github.com/Mahmoud6901/nuvra/releases/latest"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="../assets/icons/platforms.svg#windows"/></svg><span data-download-label>إصدارات ويندوز</span></a>
+    <p data-platform-copy="downloadIntro">اختار ويندوز أو macOS من تحت. مجاني ومفتوح المصدر.</p>
+    <a class="button button-large" data-platform-download href="https://github.com/Mahmoud6901/nuvra/releases/latest"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="../assets/icons/platforms.svg#download"/></svg><span data-download-label>اختار نسخة جهازك</span></a>
   </div>
-  <p class="download-status" id="download-status" role="status">اختار ويندوز أو الماك. لو روابط التحميل مش متاحة، افتح صفحة الإصدارات.</p>
+  <p class="download-status" id="primary-download-status" role="status"></p>
   <div class="mac-download" id="macos-download">
     <div class="mac-download-copy">
       <h3>نسخة الماك التجريبية</h3>
@@ -243,9 +240,17 @@
         <a class="button" data-macos-arch="arm64" hidden><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="../assets/icons/platforms.svg#apple"/></svg><span data-download-label>تحميل لـ Apple Silicon</span></a>
         <a class="button" data-macos-arch="x86_64" hidden><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="../assets/icons/platforms.svg#apple"/></svg><span data-download-label>تحميل لماك Intel</span></a>
       </div>
-      <p class="mac-release-links"><a href="https://github.com/Mahmoud6901/nuvra/releases">كل الإصدارات</a> · <a href="https://github.com/Mahmoud6901/nuvra/actions/workflows/macos.yml">النسخ التجريبية</a></p>
+      <p class="mac-release-links"><a href="https://github.com/Mahmoud6901/nuvra/releases">كل الإصدارات</a> · <a href="https://github.com/Mahmoud6901/nuvra/actions/workflows/macos.yml?query=branch%3Amain+is%3Asuccess">النسخ التجريبية (بتحتاج دخول GitHub)</a></p>
     </div>
   </div>
+  <details class="other-downloads" id="other-platform-downloads" open>
+    <summary>أنظمة تانية · ويندوز</summary>
+    <div class="close-row">
+      <p>لويندوز 10 و11 بنظام 64 بت. ملف التثبيت بيضيف Microsoft WebView2 لو محتاجه. مجاني ومفتوح المصدر.</p>
+      <a class="button button-large" id="windows-download" href="https://github.com/Mahmoud6901/nuvra/releases/latest"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="../assets/icons/platforms.svg#windows"/></svg><span data-download-label>إصدارات ويندوز</span></a>
+    </div>
+    <p class="download-status" id="download-status" role="status">اختار ويندوز أو الماك. لو روابط التحميل مش متاحة، افتح صفحة الإصدارات.</p>
+  </details>
 </section>
 
 </main>

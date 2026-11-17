@@ -3,9 +3,11 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const source = fs.readFileSync(require('node:path').join(__dirname, '../site/downloads.js'), 'utf8');
+const platformSource = fs.readFileSync(require('node:path').join(__dirname, '../site/platform.js'), 'utf8');
 const root = 'https://github.com/Mahmoud6901/nuvra/releases/download/v0.5.5/';
 const asset = name => ({ name, browser_download_url: root + name });
-const exe = asset('ArabicRelay-Setup-0.5.5.exe');
+const exe = asset('Nuvra-Setup-0.5.5.exe');
+const legacyExe = asset('ArabicRelay-Setup-0.5.5.exe');
 const dmg = arch => asset(`Nuvra-0.5.5-macos-${arch}.dmg`);
 const release = { tag_name: 'v0.5.5', assets: [exe, dmg('arm64'), dmg('x86_64')] };
 const mac = architecture => ({ platform: 'MacIntel', userAgent: 'Macintosh; Intel Mac OS X 10_15_7',
@@ -18,15 +20,15 @@ function button({ compact = false, arch } = {}) {
     setAttribute(name, value) { this.attributes[name] = value; } };
 }
 async function run({ data = release, browser = {}, failure, instantTimeout = false, language = 'en' } = {}) {
-  const primary = [button({ compact: true }), button(), button()];
+  const primary = [button({ compact: true }), button(), button(), button()];
   const windows = button(); windows.href = 'https://github.com/Mahmoud6901/nuvra/releases/latest';
   const buttons = ['arm64', 'x86_64'].map(arch => button({ arch }));
   const links = { hidden: true, querySelectorAll: () => buttons };
-  const status = {}, macStatus = {};
-  const nodes = { 'windows-download': windows, 'download-status': status, 'mac-release-status': macStatus, 'mac-download-links': links };
+  const status = {}, macStatus = {}, primaryStatus = {};
+  const nodes = { 'primary-download-status': primaryStatus, 'windows-download': windows, 'download-status': status, 'mac-release-status': macStatus, 'mac-download-links': links };
   let requests = 0;
   const context = vm.createContext({
-    document: { documentElement: { lang: language, dataset: { assetPrefix: language === 'ar' ? '../' : '' } }, getElementById: id => nodes[id], querySelectorAll: () => primary }, navigator: browser,
+    document: { documentElement: { lang: language, dataset: { assetPrefix: language === 'ar' ? '../' : '' } }, getElementById: id => nodes[id], querySelectorAll: selector => selector === '[data-platform-download]' ? primary : [] }, navigator: browser, window: {},
     AbortSignal, setTimeout: instantTimeout ? callback => setTimeout(callback, 0) : setTimeout, clearTimeout,
     fetch: async url => {
       requests++;
@@ -35,9 +37,10 @@ async function run({ data = release, browser = {}, failure, instantTimeout = fal
       return { ok: !failure, json: async () => data };
     },
   });
+  vm.runInContext(platformSource, context);
   await vm.runInContext(source, context);
   assert.equal(requests, 1, 'One release lookup serves every download button');
-  return { primary, windows, buttons, links, status, macStatus };
+  return { primary, windows, buttons, links, status, macStatus, primaryStatus };
 }
 (async () => {
   for (const browser of [{ platform: 'Win32' }, { userAgent: 'Windows NT 10.0; Win64; x64' }, { userAgentData: { platform: 'Windows' } }]) {
@@ -50,6 +53,12 @@ async function run({ data = release, browser = {}, failure, instantTimeout = fal
     }
     assert.equal(r.primary[0].label.textContent, 'Download');
     assert.equal(r.primary[1].label.textContent, 'Download for Windows');
+  }
+  for (const assets of [[legacyExe], [legacyExe, exe]]) {
+    const r = await run({ browser: { platform: 'Win32' }, data: { ...release, assets } });
+    const expected = assets.includes(exe) ? exe : legacyExe;
+    assert.ok(r.primary.every(link => link.href === expected.browser_download_url));
+    assert.equal(r.primaryStatus.textContent, r.status.textContent);
   }
   for (const [hint, arch] of [['arm', 'arm64'], ['x86', 'x86_64']]) {
     const r = await run({ browser: mac(hint) });
@@ -86,10 +95,12 @@ async function run({ data = release, browser = {}, failure, instantTimeout = fal
   assert.equal(r.buttons[1].hidden, true);
   r = await run({ data: { ...release, assets: [exe] }, browser: mac('arm') });
   assert.equal(r.links.hidden, true);
-  assert.match(r.macStatus.textContent, /not available/);
-  assert.match(r.primary[1].label.textContent, /availability/);
+  assert.match(r.macStatus.textContent, /Sign in/);
+  assert.match(r.primaryStatus.textContent, /Sign-in required/);
+  assert.match(r.primary[1].label.textContent, /Get Mac preview/);
+  assert.equal(r.primary[1].href, 'https://github.com/Mahmoud6901/nuvra/actions/workflows/macos.yml?query=branch%3Amain+is%3Asuccess');
   r = await run({ data: { ...release, assets: [] }, browser: { platform: 'Win32' } });
-  assert.equal(r.primary[1].href, '#download');
+  assert.equal(r.primary[1].href, 'https://github.com/Mahmoud6901/nuvra/releases/latest');
   assert.match(r.status.textContent, /no Windows installer/);
   for (const data of [null, { ...release, draft: true }, { ...release, prerelease: true },
     { ...release, tag_name: '../../bad' }, { ...release, assets: {} },
@@ -99,12 +110,13 @@ async function run({ data = release, browser = {}, failure, instantTimeout = fal
     r = await run({ data, browser: mac('arm') });
     assert.equal(r.links.hidden, true);
     assert.ok(r.buttons.every(link => !link.href));
-    assert.equal(r.primary[1].href, '#macos-download');
+    assert.ok(r.primary[1].href === '#macos-download' || r.primary[1].href.includes('/actions/workflows/macos.yml'));
     assert.equal(r.windows.href, 'https://github.com/Mahmoud6901/nuvra/releases/latest');
   }
   for (const failure of ['offline', 'rate-limit']) {
     r = await run({ failure, browser: { platform: 'Win32' } });
-    assert.equal(r.primary[1].href, '#download');
+    assert.equal(r.primary[1].href, 'https://github.com/Mahmoud6901/nuvra/releases/latest');
+    assert.match(r.primary[1].label.textContent, /Windows releases/);
     assert.match(r.status.textContent, /download manually/);
     assert.equal(r.windows.label.textContent, 'Windows releases');
   }

@@ -1,6 +1,7 @@
 // Nuvra landing page. Everything here is an enhancement: without it the page shows the first example and
 // its answer and every section is visible. The scroll scenes live in scenes.js.
 
+const finishKey = window.nuvraPlatform?.keys.finish || 'Enter';
 const siteArabic = document.documentElement.lang === 'ar';
 const siteText = (english, arabic) => siteArabic ? arabic : english;
 
@@ -101,14 +102,14 @@ function render() {
   } else if (mode === 'structured') {
     if (example) {
       html = escape(example.structured);
-      note = siteText('Written by your Codex or Claude Code model, then pasted where your cursor was. Enter is still yours to press.', 'النموذج اللي اخترته في Codex أو Claude Code بيجهّز النص، وبعدين بيتلصق مكان المؤشر. إنت اللي بتدوس Enter عشان تبعت.');
+      note = siteText(`Written by your Codex or Claude Code model, then pasted where your cursor was. ${finishKey} is still yours to press.`, `النموذج اللي اخترته في Codex أو Claude Code بيجهّز النص، وبعدين بيتلصق مكان المؤشر. إنت اللي بتدوس ${finishKey} عشان تبعت.`);
     } else {
       html = '<span class="wait">' + siteText('In the app, your Codex or Claude Code model rewrites this whole request as clear instructions.', 'في التطبيق، نموذج Codex أو Claude Code بيعيد كتابة الطلب كله كتعليمات واضحة.') + '</span>';
       note = siteText('Pick one of the examples to see a structured prompt.', 'اختار مثال عشان تشوف برومبت منظّم.');
     }
   } else if (example) {
     html = example.inline.map((p) => (Array.isArray(p) ? `<span class="slot">${escape(p[0])}</span>` : escape(p))).join('');
-    note = siteText(`Pasted where your cursor was. Kept as you said them: ${listKept(runs(example.ar))}. Enter is still yours to press.`, `اتلصق مكان المؤشر. الكلمات دي فضلت زي ما قلتها: ${listKept(runs(example.ar))}. إنت اللي بتدوس Enter عشان تبعت.`);
+    note = siteText(`Pasted where your cursor was. Kept as you said them: ${listKept(runs(example.ar))}. ${finishKey} is still yours to press.`, `اتلصق مكان المؤشر. الكلمات دي فضلت زي ما قلتها: ${listKept(runs(example.ar))}. إنت اللي بتدوس ${finishKey} عشان تبعت.`);
   } else if (!arabic) {
     html = escape(said);
     note = siteText('No Arabic here, so it is pasted exactly as you said it.', 'مفيش عربي هنا، فالنص بيتلصق زي ما هو.');
