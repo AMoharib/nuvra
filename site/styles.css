@@ -99,6 +99,8 @@ kbd { display: inline-block; padding: 0 0.32em; border-radius: 0.2em; background
 
 /* the recording pill, drawn from the app (147 x 40) at the size of the type */
 .pill { position: relative; display: inline-block; vertical-align: baseline; height: 0.66em; width: 2.43em; margin-right: 0.14em; background: var(--pill); border-radius: 999px; outline: 1px solid rgba(255, 255, 255, 0.16); outline-offset: -1px; }
+/* Center the pill against Zain's visible headline, including its descenders. */
+.hero-title .pill { vertical-align: -0.09em; }
 .pill-btn { position: absolute; top: 50%; width: 0.462em; height: 0.462em; margin-top: -0.231em; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, 0.14); color: #fff; }
 .pill-btn:first-child { left: 0.099em; }
 .pill-btn.go { right: 0.099em; background: #fff; color: var(--pill); }
