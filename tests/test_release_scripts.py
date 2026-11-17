@@ -42,12 +42,19 @@ class Signing(unittest.TestCase):
         self.assertEqual(len(signature), 64)
         self.assertTrue(updates.verify(setup, signature, self.public))
 
-    def fake_gh(self, calls):
+    def fake_gh(self, calls, assets=None):
+        if assets is None:
+            assets = {f'{prefix}-Setup-0.2.0.exe': b'MZ installer' for prefix in ('Nuvra', 'ArabicRelay')}
         def run(command, **kwargs):
             calls.append(command)
             if command[:3] == ['gh', 'release', 'download']:
                 folder = Path(command[command.index('-D') + 1])
-                (folder / 'ArabicRelay-Setup-0.2.0.exe').write_bytes(b'MZ installer')
+                for name, content in assets.items():
+                    (folder / name).write_bytes(content)
+            if command[:3] == ['gh', 'release', 'upload']:
+                for filename in command[4:-1]:
+                    signature = Path(filename)
+                    self.assertTrue(updates.verify(signature.with_suffix(''), signature.read_bytes(), self.public))
             return subprocess.CompletedProcess(command, 0, '', '')
         return run
 
@@ -59,15 +66,34 @@ class Signing(unittest.TestCase):
         self.assertEqual([c[:3] for c in calls], [['gh', 'release', 'download']])
 
     def test_publish_runs_gh_in_order(self):
-        calls = []
-        with patch.object(sign_release.subprocess, 'run', side_effect=self.fake_gh(calls)), \
-                patch.object(updates, 'PUBLIC_KEY', self.public):
-            self.assertEqual(sign_release.main(['v0.2.0', '--key', str(self.key)]), 0)
-        self.assertEqual([c[:3] for c in calls], [['gh', 'release', 'download'], ['gh', 'release', 'upload'], ['gh', 'release', 'edit']])
-        self.assertEqual(calls[0][3:], ['v0.2.0', '-p', 'ArabicRelay-Setup-*.exe', '-D', calls[0][-1]])
-        self.assertTrue(calls[1][4].endswith('ArabicRelay-Setup-0.2.0.exe.sig'))
-        self.assertIn('--clobber', calls[1])
-        self.assertEqual(calls[2][3:], ['v0.2.0', '--draft=false'])
+        for prefixes in [('Nuvra',), ('ArabicRelay',), ('Nuvra', 'ArabicRelay')]:
+            with self.subTest(prefixes=prefixes):
+                calls = []
+                assets = {f'{p}-Setup-0.2.0.exe': b'MZ installer' for p in prefixes}
+                with patch.object(sign_release.subprocess, 'run', side_effect=self.fake_gh(calls, assets)), \
+                        patch.object(updates, 'PUBLIC_KEY', self.public):
+                    self.assertEqual(sign_release.main(['v0.2.0', '--key', str(self.key)]), 0)
+                self.assertEqual([c[:3] for c in calls], [['gh', 'release', 'download'], ['gh', 'release', 'upload'], ['gh', 'release', 'edit']])
+                self.assertEqual(calls[0][3:], ['v0.2.0', '-p', 'Nuvra-Setup-0.2.0.exe', '-p', 'ArabicRelay-Setup-0.2.0.exe', '-D', calls[0][-1]])
+                self.assertEqual([Path(p).name for p in calls[1][4:-1]], [n + '.sig' for n in assets])
+                self.assertEqual(calls[1][-1], '--clobber')
+                self.assertEqual(calls[2][3:], ['v0.2.0', '--draft=false'])
+
+    def test_missing_wrong_version_or_mismatched_aliases_are_not_published(self):
+        for assets in [{}, {'Nuvra-Setup-0.1.0.exe': b'MZ'},
+                       {'Nuvra-Setup-0.2.0.exe': b'MZ new', 'ArabicRelay-Setup-0.2.0.exe': b'MZ old'}]:
+            with self.subTest(assets=assets):
+                calls = []
+                with patch.object(sign_release.subprocess, 'run', side_effect=self.fake_gh(calls, assets)), \
+                        patch.object(updates, 'PUBLIC_KEY', self.public):
+                    self.assertEqual(sign_release.main(['v0.2.0', '--key', str(self.key)]), 1)
+                self.assertEqual([c[:3] for c in calls], [['gh', 'release', 'download']])
+
+    def test_invalid_tag_is_rejected_before_github(self):
+        with patch.object(sign_release, 'gh') as gh:
+            with self.assertRaises(SystemExit):
+                sign_release.main(['v0.2.*', '--key', str(self.key)])
+        gh.assert_not_called()
 
 
 if __name__ == '__main__':

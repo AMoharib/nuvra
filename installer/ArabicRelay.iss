@@ -18,8 +18,8 @@ RestartApplications=no
 UninstallDisplayIcon={app}\Nuvra.exe
 SetupIconFile=..\src\arabic_relay\assets\relay.ico
 OutputDir=..\dist
-; Existing clients find this exact asset name when checking for updates.
-OutputBaseFilename=ArabicRelay-Setup-{#AppVersion}
+; The release workflow adds a byte-identical alias for older auto-updaters.
+OutputBaseFilename=Nuvra-Setup-{#AppVersion}
 WizardStyle=modern
 Compression=lzma2
 SolidCompression=yes

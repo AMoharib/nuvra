@@ -7,6 +7,19 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 class Installer(unittest.TestCase):
+    def test_new_filename_preserves_upgrade_identity_and_legacy_release_alias(self):
+        installer = (ROOT / 'installer' / 'ArabicRelay.iss').read_text(encoding='utf-8')
+        build = (ROOT / 'scripts' / 'build.ps1').read_text(encoding='utf-8')
+        release = (ROOT / '.github' / 'workflows' / 'release.yml').read_text(encoding='utf-8')
+        self.assertIn('OutputBaseFilename=Nuvra-Setup-{#AppVersion}', installer)
+        self.assertIn('AppId={{B981CB91-79B0-4049-ABF8-C2A11A94560B}', installer)
+        self.assertIn('$setup = "dist\\Nuvra-Setup-$version.exe"', build)
+        self.assertIn('$name = "Nuvra-Setup-$version.exe"', release)
+        self.assertIn('$legacy = "ArabicRelay-Setup-$version.exe"', release)
+        self.assertIn('Copy-Item "dist\\$name" "dist\\$legacy"', release)
+        self.assertIn('@($name, $legacy) | ForEach-Object', release)
+        self.assertIn('"dist/Nuvra-Setup-$version.exe" "dist/ArabicRelay-Setup-$version.exe"', release)
+
     def test_frozen_build_only_includes_public_application_assets(self):
         # Ignored legacy data next to source must not become part of a distributable build.
         spec = (ROOT / 'installer' / 'ArabicRelay.spec').read_text(encoding='utf-8')
