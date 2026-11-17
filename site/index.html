@@ -12,6 +12,9 @@
 <meta name="color-scheme" content="dark">
 <meta name="page-type" content="software">
 <meta name="site-kind" content="software">
+<link rel="canonical" href="https://mahmoud6901.github.io/nuvra/">
+<link rel="alternate" hreflang="en" href="https://mahmoud6901.github.io/nuvra/">
+<link rel="alternate" hreflang="ar" href="https://mahmoud6901.github.io/nuvra/ar/">
 <link rel="icon" type="image/png" href="assets/icon-96.png">
 <script>document.documentElement.classList.add('js')</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,8 +37,9 @@
         <li><a class="link" href="#privacy">Privacy</a></li>
         <li><a class="link" href="#questions">Questions</a></li>
       </ul>
+      <a class="language-switch link" href="ar/" lang="ar" hreflang="ar">العربية</a>
       <a class="repo-link" href="https://github.com/Mahmoud6901/nuvra" aria-label="Nuvra source code on GitHub" title="View source on GitHub"><img src="assets/icons/github.svg" width="24" height="24" alt=""></a>
-      <a class="button button-small" href="#download">Download</a>
+      <a class="button button-small" data-platform-download data-download-compact href="#download"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#download"/></svg><span data-download-label>Download</span></a>
     </div>
   </nav>
 
@@ -45,7 +49,7 @@
       <span class="line"><span data-line style="--i:1"><span class="pill" data-ui aria-hidden="true"><span class="pill-btn"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></svg></span><span class="pill-dots"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i></span><span class="pill-btn go"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8"/></svg></span></span> paste English</span></span>
     </h1>
     <p class="hero-sub" data-load style="--d:420ms">A free dictation app: use one shortcut, talk in Arabic and English, and clear English is pasted where you were typing.</p>
-    <a class="button hero-action" data-load style="--d:500ms" href="#download">Choose your download</a>
+    <a class="button hero-action" data-load style="--d:500ms" data-platform-download href="#download"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#download"/></svg><span data-download-label>Choose your download</span></a>
     <p class="platform-note">Windows 10/11 · <a href="#macos-download">macOS 15+ preview</a></p>
   </div>
 
@@ -69,7 +73,7 @@
       </div>
       <div class="turn-paste">
         <p class="turn-cap cap-paste">Nuvra pastes</p>
-        <p class="turn-line turn-en"><span class="t">Review</span> <span class="t">the</span> <span class="t keep" data-keep="login">login</span> <span class="t">page</span> <span class="t">and</span> <span class="t">improve</span> <span class="t">the</span> <span class="t keep" data-keep="errors">error messages</span></p>
+        <p class="turn-line turn-en" lang="en" dir="ltr"><span class="t">Review</span> <span class="t">the</span> <span class="t keep" data-keep="login">login</span> <span class="t">page</span> <span class="t">and</span> <span class="t">improve</span> <span class="t">the</span> <span class="t keep" data-keep="errors">error messages</span></p>
       </div>
     </div>
     <p class="turn-text">That is how most of us talk about code. Nuvra translates the Arabic and leaves your English words exactly as you said them.</p>
@@ -88,7 +92,7 @@
       <button type="button" class="answer-mode" data-mode="structured" aria-pressed="false">Structured prompt</button>
     </div>
     <div class="answer-field">
-      <p class="answer-text" id="answer-text" aria-live="polite"><span class="slot">Review the</span> login <span class="slot">page and improve the</span> error messages<span class="answer-caret" aria-hidden="true"></span></p>
+      <p class="answer-text" lang="en" dir="ltr" id="answer-text" aria-live="polite"><span class="slot">Review the</span> login <span class="slot">page and improve the</span> error messages<span class="answer-caret" aria-hidden="true"></span></p>
     </div>
     <p class="answer-note" id="answer-note">Pasted where your cursor was. Kept as you said them: login, error messages. Enter is still yours to press.</p>
   </div>
@@ -122,7 +126,7 @@
       <div class="pill demo-pill"><span class="pill-btn"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></svg></span><span class="pill-dots demo-dots"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i></span><span class="pill-btn go"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8"/></svg></span></div>
       <div class="demo-field">
         <p class="demo-app">Team chat</p>
-        <p class="demo-text"><span class="demo-placeholder">Write a message</span><span class="demo-out">Review the login page and improve the error messages.</span><span class="demo-caret"></span></p>
+        <p class="demo-text"><span class="demo-placeholder">Write a message</span><span class="demo-out" lang="en" dir="ltr">Review the login page and improve the error messages.</span><span class="demo-caret"></span></p>
         <p class="demo-send">Enter sends. Nuvra never presses it.</p>
       </div>
     </div>
@@ -178,7 +182,7 @@
   </div>
   <div class="kept-after" data-reveal style="--i:2">
     <p>The window holds only History, Models and Settings. There is nothing to write in it: speaking always starts from the shortcut, wherever you are.</p>
-    <a class="button" href="#download">Choose your download</a>
+    <a class="button" data-platform-download href="#download"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#download"/></svg><span data-download-label>Choose your download</span></a>
   </div>
 </section>
 
@@ -224,8 +228,9 @@
   <h2 class="close-title rise" id="close-title" data-reveal><span class="line"><span>Talk the way</span></span><span class="line"><span>you think</span></span></h2>
   <div class="close-row" data-reveal style="--i:1">
     <p>For Windows 10 and 11, 64-bit. The installer adds Microsoft WebView2 if you need it. Free and open source.</p>
-    <a class="button button-large" href="https://github.com/Mahmoud6901/nuvra/releases/latest">Download for Windows</a>
+    <a class="button button-large" id="windows-download" href="https://github.com/Mahmoud6901/nuvra/releases/latest"><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#windows"/></svg><span data-download-label>Windows releases</span></a>
   </div>
+  <p class="download-status" id="download-status" role="status">Choose Windows or macOS. If download links are unavailable, open the release page.</p>
   <div class="mac-download" id="macos-download">
     <div class="mac-download-copy">
       <h3>macOS preview</h3>
@@ -235,10 +240,10 @@
     <div class="mac-download-actions">
       <p id="mac-release-status" role="status">Check the release page for macOS preview builds.</p>
       <div class="mac-download-links" id="mac-download-links" hidden>
-        <a class="button" data-macos-arch="arm64" hidden>Download for Apple Silicon</a>
-        <a class="button" data-macos-arch="x86_64" hidden>Download for Intel Mac</a>
+        <a class="button" data-macos-arch="arm64" hidden><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#apple"/></svg><span data-download-label>Download for Apple Silicon</span></a>
+        <a class="button" data-macos-arch="x86_64" hidden><svg class="download-icon" width="20" height="20" aria-hidden="true" focusable="false"><use href="assets/icons/platforms.svg#apple"/></svg><span data-download-label>Download for Intel Mac</span></a>
       </div>
-      <p class="mac-release-links"><a href="https://github.com/Mahmoud6901/nuvra/releases">All releases</a> · <a href="https://github.com/Mahmoud6901/nuvra/pull/1">Preview status</a></p>
+      <p class="mac-release-links"><a href="https://github.com/Mahmoud6901/nuvra/releases">All releases</a> · <a href="https://github.com/Mahmoud6901/nuvra/actions/workflows/macos.yml">Preview builds</a></p>
     </div>
   </div>
 </section>

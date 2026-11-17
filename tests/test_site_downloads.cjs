@@ -1,57 +1,119 @@
-// Release downloads must never advertise an asset that has not been published.
+// Exercise the real download script with release responses and browser platform hints.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const source = fs.readFileSync(require('node:path').join(__dirname, '../site/downloads.js'), 'utf8');
 const root = 'https://github.com/Mahmoud6901/nuvra/releases/download/v0.5.5/';
-const asset = arch => {
-  const name = `Nuvra-0.5.5-macos-${arch}.dmg`;
-  return { name, browser_download_url: root + name };
-};
-async function run(release, failure) {
-  const status = { textContent: 'Check the release page for macOS preview builds.' };
-  const buttons = ['arm64', 'x86_64'].map(arch => ({ hidden: true, dataset: { macosArch: arch } }));
+const asset = name => ({ name, browser_download_url: root + name });
+const exe = asset('ArabicRelay-Setup-0.5.5.exe');
+const dmg = arch => asset(`Nuvra-0.5.5-macos-${arch}.dmg`);
+const release = { tag_name: 'v0.5.5', assets: [exe, dmg('arm64'), dmg('x86_64')] };
+const mac = architecture => ({ platform: 'MacIntel', userAgent: 'Macintosh; Intel Mac OS X 10_15_7',
+  userAgentData: { platform: 'macOS', getHighEntropyValues: async () => ({ architecture, bitness: '64' }) } });
+function button({ compact = false, arch } = {}) {
+  const label = { textContent: '' }, icon = { setAttribute(name, value) { this[name] = value; } };
+  return { hidden: !!arch, dataset: { macosArch: arch }, attributes: {}, label, icon,
+    hasAttribute: name => name === 'data-download-compact' && compact,
+    querySelector: selector => selector === 'use' ? icon : label,
+    setAttribute(name, value) { this.attributes[name] = value; } };
+}
+async function run({ data = release, browser = {}, failure, instantTimeout = false, language = 'en' } = {}) {
+  const primary = [button({ compact: true }), button(), button()];
+  const windows = button(); windows.href = 'https://github.com/Mahmoud6901/nuvra/releases/latest';
+  const buttons = ['arm64', 'x86_64'].map(arch => button({ arch }));
   const links = { hidden: true, querySelectorAll: () => buttons };
+  const status = {}, macStatus = {};
+  const nodes = { 'windows-download': windows, 'download-status': status, 'mac-release-status': macStatus, 'mac-download-links': links };
+  let requests = 0;
   const context = vm.createContext({
-    document: { getElementById: id => id === 'mac-release-status' ? status : links },
-    AbortSignal,
+    document: { documentElement: { lang: language, dataset: { assetPrefix: language === 'ar' ? '../' : '' } }, getElementById: id => nodes[id], querySelectorAll: () => primary }, navigator: browser,
+    AbortSignal, setTimeout: instantTimeout ? callback => setTimeout(callback, 0) : setTimeout, clearTimeout,
     fetch: async url => {
+      requests++;
       assert.equal(url, 'https://api.github.com/repos/Mahmoud6901/nuvra/releases/latest');
       if (failure === 'offline') throw new Error('offline');
-      return { ok: !failure, json: async () => release };
+      return { ok: !failure, json: async () => data };
     },
   });
   await vm.runInContext(source, context);
-  return { status, links, buttons };
+  assert.equal(requests, 1, 'One release lookup serves every download button');
+  return { primary, windows, buttons, links, status, macStatus };
 }
 (async () => {
-  const release = { tag_name: 'v0.5.5', assets: [asset('arm64'), asset('x86_64')] };
-  let result = await run(release);
-  assert.equal(result.links.hidden, false);
-  for (const button of result.buttons) {
-    assert.equal(button.hidden, false);
-    assert.equal(button.href, root + `Nuvra-0.5.5-macos-${button.dataset.macosArch}.dmg`);
+  for (const browser of [{ platform: 'Win32' }, { userAgent: 'Windows NT 10.0; Win64; x64' }, { userAgentData: { platform: 'Windows' } }]) {
+    const r = await run({ browser });
+    assert.equal(r.windows.href, exe.browser_download_url);
+    for (const link of r.primary) {
+      assert.equal(link.href, exe.browser_download_url);
+      assert.match(link.icon.href, /#windows$/);
+      assert.match(link.attributes['aria-label'], /Windows \(\.exe\)/);
+    }
+    assert.equal(r.primary[0].label.textContent, 'Download');
+    assert.equal(r.primary[1].label.textContent, 'Download for Windows');
   }
-  result = await run({ ...release, assets: [asset('arm64')] });
-  assert.equal(result.buttons[0].hidden, false);
-  assert.equal(result.buttons[1].hidden, true);
-  assert.match(result.status.textContent, /one architecture/);
-  result = await run({ ...release, assets: [] });
-  assert.equal(result.links.hidden, true);
-  assert.match(result.status.textContent, /not available/);
-  for (const modified of [
-    { ...release, draft: true }, { ...release, prerelease: true }, { ...release, tag_name: '../../bad' },
-    { ...release, assets: [{ ...asset('arm64'), browser_download_url: 'https://example.invalid/download' }] },
-    { ...release, assets: [{ ...asset('arm64'), name: 'Nuvra-0.5.4-macos-arm64.dmg' }] },
+  for (const [hint, arch] of [['arm', 'arm64'], ['x86', 'x86_64']]) {
+    const r = await run({ browser: mac(hint) });
+    for (const link of r.primary) {
+      assert.equal(link.href, dmg(arch).browser_download_url);
+      assert.match(link.icon.href, /#apple$/);
+      assert.equal(link.title, link.attributes['aria-label']);
+    }
+    assert.equal(r.links.hidden, false);
+    assert.ok(r.buttons.every(link => !link.hidden && /#apple$/.test(link.icon.href)));
+    assert.equal(r.windows.href, exe.browser_download_url, 'Other-platform downloads remain available');
+  }
+  for (const browser of [
+    { platform: 'MacIntel', userAgent: 'Macintosh; Intel Mac OS X 10_15_7' },
+    mac(''), mac('unknown'),
+    { platform: 'MacIntel', userAgentData: { getHighEntropyValues: async () => { throw new Error('denied'); } } },
+    { platform: 'MacIntel', userAgentData: { getHighEntropyValues: () => new Promise(() => {}) } },
   ]) {
-    result = await run(modified);
-    assert.equal(result.links.hidden, true);
-    assert.ok(result.buttons.every(button => !button.href));
+    const r = await run({ browser, instantTimeout: true });
+    assert.equal(r.primary[1].href, '#macos-download', 'Missing hints must not default an Apple Silicon Mac to Intel');
+    assert.match(r.primary[1].label.textContent, /Choose your Mac/);
+    assert.ok(r.buttons.every(link => !link.hidden));
+  }
+  for (const browser of [{ platform: 'Linux x86_64' }, { platform: 'MacIntel', maxTouchPoints: 5 },
+    { userAgent: 'iPhone; CPU iPhone OS 18 like Mac OS X' }, { userAgent: 'Linux; Android 15' },
+    { userAgentData: { platform: 'macOS', mobile: true } }, {}]) {
+    const r = await run({ browser });
+    assert.equal(r.primary[1].href, '#download');
+    assert.match(r.primary[1].icon.href, /#download$/);
+  }
+  let r = await run({ data: { ...release, assets: [exe, dmg('arm64')] }, browser: mac('x86') });
+  assert.equal(r.primary[1].href, '#macos-download', 'Never substitute the wrong Mac architecture');
+  assert.match(r.macStatus.textContent, /one architecture/);
+  assert.equal(r.buttons[1].hidden, true);
+  r = await run({ data: { ...release, assets: [exe] }, browser: mac('arm') });
+  assert.equal(r.links.hidden, true);
+  assert.match(r.macStatus.textContent, /not available/);
+  assert.match(r.primary[1].label.textContent, /availability/);
+  r = await run({ data: { ...release, assets: [] }, browser: { platform: 'Win32' } });
+  assert.equal(r.primary[1].href, '#download');
+  assert.match(r.status.textContent, /no Windows installer/);
+  for (const data of [null, { ...release, draft: true }, { ...release, prerelease: true },
+    { ...release, tag_name: '../../bad' }, { ...release, assets: {} },
+    { ...release, assets: [null, { ...exe, browser_download_url: 'https://evil.invalid/file.exe' }] },
+    { ...release, assets: [{ ...dmg('arm64'), browser_download_url: root + 'Nuvra-0.5.4-macos-arm64.dmg' }] },
+  ]) {
+    r = await run({ data, browser: mac('arm') });
+    assert.equal(r.links.hidden, true);
+    assert.ok(r.buttons.every(link => !link.href));
+    assert.equal(r.primary[1].href, '#macos-download');
+    assert.equal(r.windows.href, 'https://github.com/Mahmoud6901/nuvra/releases/latest');
   }
   for (const failure of ['offline', 'rate-limit']) {
-    result = await run(release, failure);
-    assert.equal(result.links.hidden, true);
-    assert.match(result.status.textContent, /Check the release page/);
+    r = await run({ failure, browser: { platform: 'Win32' } });
+    assert.equal(r.primary[1].href, '#download');
+    assert.match(r.status.textContent, /download manually/);
+    assert.equal(r.windows.label.textContent, 'Windows releases');
   }
-  console.log('Site download tests passed: published, partial, absent, invalid and unavailable releases.');
+  r = await run({ browser: mac('arm'), language: 'ar' });
+  assert.equal(r.primary[1].label.textContent, 'تحميل للماك');
+  assert.equal(r.primary[0].label.textContent, 'تحميل');
+  assert.equal(r.primary[1].icon.href, '../assets/icons/platforms.svg#apple');
+  assert.match(r.macStatus.textContent, /نسخة الماك التجريبية/);
+  r = await run({ failure: 'offline', language: 'ar' });
+  assert.match(r.status.textContent, /تحميل اليدوي/);
+  console.log('Site downloads passed: direct Windows/Mac assets, platform icons, chip fallback, mobile, missing assets and API failures.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

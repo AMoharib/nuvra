@@ -10,5 +10,18 @@
     "url": "https://github.com/gilbarbara/logos",
     "trademark": true,
     "markUrl": "https://github.com/"
+  },
+  {
+    "file": "platforms.svg",
+    "icons": [
+      "apple",
+      "windows"
+    ],
+    "source": "twbs/icons@v1.13.1",
+    "author": "The Bootstrap Authors",
+    "licence": "MIT",
+    "url": "https://github.com/twbs/icons/tree/v1.13.1",
+    "trademark": true,
+    "modifications": "Combined paths into SVG symbols; generic download symbol authored for this site."
   }
 ]
