@@ -1,5 +1,6 @@
 """Build and smoke-test a native Nuvra.app, then package a drag-to-install DMG and ZIP."""
 import hashlib
+from importlib.util import find_spec
 import os
 from pathlib import Path
 import platform
@@ -14,6 +15,25 @@ def run(*command, **kwargs):
     subprocess.run(command, cwd=ROOT, check=True, **kwargs)
 
 
+def verify_cryptography_linkage():
+    """Reject OpenSSL dependencies that collide with Python's bundled dylibs."""
+    # Locate without importing the extension, which may already fail to load.
+    spec = find_spec('cryptography.hazmat.bindings._rust')
+    if spec is None or spec.origin is None:
+        raise SystemExit('Install the macOS build dependencies before packaging.')
+    linked = subprocess.check_output(['otool', '-L', spec.origin], text=True)
+    for line in linked.splitlines()[1:]:
+        library = line.strip().split(' (', 1)[0]
+        if Path(library).name.startswith(('libssl.', 'libcrypto.')):
+            raise SystemExit(
+                f'cryptography dynamically links {library}, which can collide with '
+                "Python's OpenSSL in the app bundle. Reinstall it with:\n"
+                'OPENSSL_STATIC=1 ' + sys.executable + ' -m pip install '
+                "--force-reinstall --no-cache-dir 'cryptography>=43'"
+            )
+    print('cryptography OpenSSL linkage verified: no shared libssl/libcrypto.')
+
+
 def main():
     if sys.platform != 'darwin':
         raise SystemExit('Build macOS assets on a Mac, using the target architecture Python.')
@@ -21,6 +41,7 @@ def main():
     arch = platform.machine()
     if arch not in ('arm64', 'x86_64'):
         raise SystemExit(f'Unsupported macOS architecture: {arch}')
+    verify_cryptography_linkage()
     build = ROOT / 'build/macos'
     build.mkdir(parents=True, exist_ok=True)
     icons = build / 'Nuvra.iconset'

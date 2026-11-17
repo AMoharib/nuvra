@@ -168,6 +168,41 @@ class Delivery(unittest.TestCase):
 
 @unittest.skipUnless(sys.platform == 'darwin', 'macOS integration')
 class Shortcuts(unittest.TestCase):
+    def test_native_status_exposes_mac_choices(self):
+        capture = Mock(hotkey=macos.RecordingHotkey(Mock(), 'ctrl-alt-r'))
+        api = desktop.DesktopApi(capture)
+        status = api.shortcut_status(desktop.server.CSRF)
+        self.assertEqual(status['platform'], 'darwin')
+        self.assertEqual(status['label'], 'Control + Option + R')
+        self.assertEqual(status['choices']['ctrl-alt-space'], 'Control + Option + Space')
+        self.assertEqual(status['choices']['ctrl-shift-space'], 'Control + Shift + Space')
+
+    def test_all_recording_bindings_reserve_only_exact_modifiers(self):
+        for choice in macos.RecordingHotkey.CHOICES:
+            with self.subTest(choice=choice), ExitStack() as stack:
+                key = macos.RecordingHotkey(Mock(), choice)
+                stack.enter_context(patch.object(macos.AX, 'AXIsProcessTrusted', return_value=True))
+                create = stack.enter_context(patch.object(macos.Q, 'CGEventTapCreate', return_value='tap'))
+                thread = stack.enter_context(patch.object(macos.threading, 'Thread'))
+                for name in ('CFMachPortCreateRunLoopSource', 'CFRunLoopAddSource', 'CFRunLoopGetCurrent',
+                             'CGEventTapEnable', 'CFMachPortInvalidate', 'CFRunLoopRemoveSource'):
+                    stack.enter_context(patch.object(macos.Q, name))
+                stack.enter_context(patch.object(macos.Q, 'CGEventGetIntegerValueField', return_value=key.key))
+                flags = stack.enter_context(patch.object(macos.Q, 'CGEventGetFlags'))
+                def events(*args):
+                    callback = create.call_args.args[4]
+                    for wrong in (0, key.modifiers | macos.Q.kCGEventFlagMaskCommand):
+                        flags.return_value = wrong
+                        self.assertEqual(callback(None, macos.Q.kCGEventKeyDown, 'event', None), 'event')
+                    flags.return_value = key.modifiers
+                    self.assertIsNone(callback(None, macos.Q.kCGEventKeyDown, 'event', None))
+                    self.assertIsNone(callback(None, macos.Q.kCGEventKeyDown, 'event', None))
+                    self.assertIsNone(callback(None, macos.Q.kCGEventKeyUp, 'event', None))
+                    key.stopping.set()
+                stack.enter_context(patch.object(macos.Q, 'CFRunLoopRunInMode', side_effect=events))
+                key._run()
+                thread.assert_called_once_with(target=key.callback, daemon=True)
+
     def test_no_permission_leaves_visible_error(self):
         key = macos.RecordingHotkey(Mock())
         with patch.object(macos.AX, 'AXIsProcessTrusted', return_value=False):

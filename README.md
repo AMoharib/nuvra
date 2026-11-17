@@ -144,10 +144,14 @@ The build creates `dist\Nuvra\Nuvra.exe` and `dist\ArabicRelay-Setup-<version>.e
 Run on the target architecture Mac with Python 3.13 and Apple's command-line tools:
 
 ```sh
+OPENSSL_STATIC=1 .venv/bin/python -m pip install --force-reinstall --no-cache-dir 'cryptography>=43'
+.venv/bin/python -m pip install -e '.[build]'
 .venv/bin/python -m unittest discover -s tests -p 'test_macos.py' -v
 .venv/bin/python -m unittest discover -s tests -p 'test_paste.py' -v
 .venv/bin/python scripts/build_macos.py
 ```
+
+Intel builds also require Homebrew's `openssl@3` and `rust` (`brew install openssl@3 rust`). Cryptography stopped publishing Intel macOS wheels in version 49, so pip builds it from source. `OPENSSL_STATIC=1` follows its [static build instructions](https://cryptography.io/en/latest/installation/#building-cryptography-on-macos) and prevents a collision with Python's bundled OpenSSL. Reinstalling without the cache replaces any previous dynamically linked build. Apple Silicon uses the upstream static wheel. The build script checks the installed extension's linkage before creating any build output.
 
 The script creates `dist/Nuvra.app`, a DMG with an Applications shortcut, a ZIP, and SHA-256 checksums. It generates the macOS icon from the existing PNG, verifies the bundle's ad-hoc signature, and runs `--self-test` using a temporary data directory. That test checks the HTTP server and imports the packaged speech engine. A second `--self-test-gui` briefly opens a native window and checks that WebKit exposes the recording APIs. Neither test records audio or sends keys to another app. Build in a logged-in graphical macOS session.
 

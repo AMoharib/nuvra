@@ -305,7 +305,9 @@ class DesktopApi:
         if token != server.CSRF or not self._capture:
             raise ValueError('Invalid request.')
         key = self._capture.hotkey
-        return {'available': key.registered, 'error': key.error, 'choice': key.choice, 'label': key.label}
+        return {'available': key.registered, 'error': key.error, 'choice': key.choice, 'label': key.label,
+                'platform': sys.platform,
+                'choices': {choice: binding[0] for choice, binding in RecordingHotkey.CHOICES.items()}}
 
     def set_shortcut(self, choice, token):
         if token != server.CSRF or not self._capture or choice not in RecordingHotkey.CHOICES:

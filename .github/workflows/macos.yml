@@ -28,13 +28,23 @@ jobs:
           python-version: '3.13'
           cache: pip
           cache-dependency-path: pyproject.toml
-      - run: python -m pip install -e '.[build]'
+      - name: Install dependencies with isolated cryptography OpenSSL
+        env:
+          # cryptography >=49 has no Intel macOS wheels. Its source build must
+          # not share libssl.3.dylib with the Python bundled by PyInstaller.
+          OPENSSL_STATIC: '1'
+        run: |
+          # Replace installed/cached dynamic builds; ARM still uses its static wheel.
+          python -m pip install --force-reinstall --no-cache-dir 'cryptography>=43'
+          python -m pip install -e '.[build]'
       - name: Verify native architecture
         run: python -c "import platform; assert platform.machine() == '${{ matrix.arch }}'"
       - name: macOS integration and shared delivery tests
         run: python -m unittest discover -s tests -p 'test_macos.py' -v
       - name: Shared clipboard delivery tests
         run: python -m unittest discover -s tests -p 'test_paste.py' -v
+      - name: Packaging dependency checks
+        run: python -m unittest discover -s tests -p 'test_build_macos.py' -v
       - name: Build and self-test the app, DMG, and ZIP
         run: python scripts/build_macos.py
       - uses: actions/upload-artifact@v4
