@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-type="software">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,19 +10,19 @@
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#09090b">
 <meta name="color-scheme" content="dark">
+<meta name="page-type" content="software">
+<meta name="site-kind" content="software">
 <link rel="icon" type="image/png" href="assets/icon-96.png">
 <script>document.documentElement.classList.add('js')</script>
-<link rel="preconnect" href="https://api.fontshare.com">
-<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://api.fontshare.com/v2/css?f[]=sentient@300,400,500&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zain:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/scenes/stage.css">
 <link rel="stylesheet" href="styles.css">
 <script src="main.js" defer></script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <header class="hero" id="top">
   <nav class="nav" aria-label="Main">
@@ -33,6 +33,7 @@
         <li><a class="link" href="#privacy">Privacy</a></li>
         <li><a class="link" href="#questions">Questions</a></li>
       </ul>
+      <a class="repo-link" href="https://github.com/Mahmoud6901/nuvra" aria-label="Nuvra source code on GitHub" title="View source on GitHub"><img src="assets/icons/github.svg" width="24" height="24" alt=""></a>
       <a class="button button-small" href="https://github.com/Mahmoud6901/nuvra/releases/latest">Download</a>
     </div>
   </nav>
@@ -51,11 +52,10 @@
       <div class="window-bar" aria-hidden="true"><img src="assets/icon-96.png" width="16" height="16" alt=""><span>Nuvra</span><span class="window-ctl"><svg viewBox="0 0 10 10"><path d="M0 5h10"/></svg><svg viewBox="0 0 10 10"><path d="M.5.5h9v9h-9z"/></svg><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10"/></svg></span></div>
       <img class="window-shot" src="assets/img/app-history-ar.webp" width="1800" height="1360" fetchpriority="high" decoding="async" alt="Nuvra's window in Arabic, on the History tab: four English texts it pasted into Visual Studio Code, Claude Code, Slack and Cursor, each with Copy and Delete.">
     </div>
-    <figcaption>History in the Arabic window: every text in English, with the app it went to.</figcaption>
   </figure>
 </header>
 
-<main>
+<main id="main" tabindex="-1">
 
 <section class="scene turn" id="mixed" data-scene="turn" data-options='{"hold":1.5}' aria-labelledby="mixed-title">
   <div class="scene-stage turn-stage">
@@ -77,18 +77,8 @@
 <section class="try" id="try" aria-labelledby="try-title">
   <h2 class="try-title rise" id="try-title" data-reveal><span class="line"><span>Your English stays English</span></span></h2>
   <div class="try-line" data-ui data-reveal style="--i:1">
-    <label class="sr-only" for="say">What you would say</label>
-    <input id="say" class="try-input" type="text" dir="rtl" lang="ar" autocomplete="off" spellcheck="false" value="راجع صفحة الـ login وحسّن الـ error messages">
-  </div>
-  <div class="try-side" data-reveal style="--i:2">
-    <p>In Translate Arabic only, Nuvra translates the Arabic phrases and leaves every English word where you said it. Structured prompt rewrites the whole request as clear instructions for your AI tool.</p>
-    <p class="try-hint">Edit the sentence above, or try another:</p>
-    <ul class="try-examples">
-      <li><button type="button" lang="ar" dir="rtl" data-example="1">ضيف زرار dark mode في الـ settings</button></li>
-      <li><button type="button" lang="ar" dir="rtl" data-example="2">الـ API بيرجّع 500 لما الـ token يخلص</button></li>
-      <li><button type="button" lang="ar" dir="rtl" data-example="3">عايز الـ form يعمل validate للـ email ولو فيه error اعرضه تحت الـ field</button></li>
-      <li><button type="button" lang="ar" dir="rtl" data-example="0">راجع صفحة الـ login وحسّن الـ error messages</button></li>
-    </ul>
+    <label class="try-label" for="say">What you would say</label>
+    <textarea id="say" class="try-input" rows="3" dir="rtl" lang="ar" autocomplete="off" spellcheck="false" aria-describedby="try-help">راجع صفحة الـ login وحسّن الـ error messages</textarea>
   </div>
   <div class="answer" data-ui data-reveal style="--i:3">
     <div class="answer-modes" role="group" aria-label="Writing mode">
@@ -99,6 +89,16 @@
       <p class="answer-text" id="answer-text" aria-live="polite"><span class="slot">Review the</span> login <span class="slot">page and improve the</span> error messages<span class="answer-caret" aria-hidden="true"></span></p>
     </div>
     <p class="answer-note" id="answer-note">Pasted where your cursor was. Kept as you said them: login, error messages. Enter is still yours to press.</p>
+  </div>
+  <div class="try-side" data-reveal style="--i:2">
+    <p>In Translate Arabic only, Nuvra translates the Arabic phrases and leaves every English word where you said it. Structured prompt rewrites the whole request as clear instructions for your AI tool.</p>
+    <p class="try-hint" id="try-help">Edit the sentence to highlight its Arabic phrases, or choose an example to see the English output.</p>
+    <ul class="try-examples">
+      <li><button type="button" lang="ar" dir="rtl" data-example="1">ضيف زرار dark mode في الـ settings</button></li>
+      <li><button type="button" lang="ar" dir="rtl" data-example="2">الـ API بيرجّع 500 لما الـ token يخلص</button></li>
+      <li><button type="button" lang="ar" dir="rtl" data-example="3">عايز الـ form يعمل validate للـ email ولو فيه error اعرضه تحت الـ field</button></li>
+      <li><button type="button" lang="ar" dir="rtl" data-example="0">راجع صفحة الـ login وحسّن الـ error messages</button></li>
+    </ul>
   </div>
 </section>
 
@@ -153,7 +153,6 @@
         <div class="window-bar" aria-hidden="true"><img src="assets/icon-96.png" width="16" height="16" alt=""><span>Nuvra</span><span class="window-ctl"><svg viewBox="0 0 10 10"><path d="M0 5h10"/></svg><svg viewBox="0 0 10 10"><path d="M.5.5h9v9h-9z"/></svg><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10"/></svg></span></div>
         <img class="window-shot" src="assets/img/app-models-ar.webp" width="1800" height="1360" loading="lazy" decoding="async" alt="The Models tab in Arabic: Whisper large-v3 and large-v3-turbo on your computer, with turbo in use on the graphics card, then Wispr Flow, Cohere Transcribe Arabic, and Codex signed in for English prompts.">
       </div>
-      <figcaption>Models: each choice says where it runs before you pick it.</figcaption>
     </figure>
   </div>
 </section>
@@ -167,14 +166,12 @@
         <div class="window-bar" aria-hidden="true"><img src="assets/icon-96.png" width="16" height="16" alt=""><span>Nuvra</span><span class="window-ctl"><svg viewBox="0 0 10 10"><path d="M0 5h10"/></svg><svg viewBox="0 0 10 10"><path d="M.5.5h9v9h-9z"/></svg><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10"/></svg></span></div>
         <img class="window-shot" src="assets/img/app-history-en.webp" width="1800" height="1360" loading="lazy" decoding="async" alt="The History tab in English: the last texts Nuvra pasted, newest first, each with the time, the app it went to, Copy and Delete.">
       </div>
-      <figcaption>History keeps your last ten texts on your computer.</figcaption>
     </figure>
     <figure class="kept-window kept-ar shutter" data-reveal style="--i:2">
       <div class="window" data-ui>
         <div class="window-bar" aria-hidden="true"><img src="assets/icon-96.png" width="16" height="16" alt=""><span>Nuvra</span><span class="window-ctl"><svg viewBox="0 0 10 10"><path d="M0 5h10"/></svg><svg viewBox="0 0 10 10"><path d="M.5.5h9v9h-9z"/></svg><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10"/></svg></span></div>
         <img class="window-shot" src="assets/img/app-settings-ar.webp" width="1800" height="1360" loading="lazy" decoding="async" alt="The Settings tab in Arabic: language set to Arabic, writing mode set to Translate Arabic only, appearance, and automatic updates for Nuvra 0.5.4.">
       </div>
-      <figcaption>Settings in Egyptian Arabic, right to left.</figcaption>
     </figure>
   </div>
   <div class="kept-after" data-reveal style="--i:2">
@@ -240,6 +237,7 @@
       <li><a class="link" href="https://github.com/Mahmoud6901/nuvra">Source code</a></li>
       <li><a class="link" href="https://github.com/Mahmoud6901/nuvra/releases">All releases</a></li>
     </ul>
+    <p class="footer-credits">Product names and logos are trademarks of their owners.</p>
     <p class="footer-year">Nuvra 0.5.4, 2026</p>
   </div>
 </footer>
